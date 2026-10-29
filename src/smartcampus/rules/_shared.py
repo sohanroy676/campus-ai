@@ -3,6 +3,7 @@
 Each rule's meaning is written once here or in its own module; `check` and `post` both call it.
 """
 
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import overload
 
@@ -174,6 +175,33 @@ def move_minutes(pool: EquipmentPool, units: int | cp_model.IntVar) -> int | cp_
     Works on plain ints (checks) and on CP-SAT variables (encodings) so the formula lives once.
     """
     return units * pool.move_minutes_per_unit + SETUP_BUFFER_MIN
+
+
+# The return trip takes as long as the outbound move. It only keeps the units unavailable.
+return_minutes = move_minutes
+
+
+def lent_until(move_start: int, class_end: int, pool: EquipmentPool, units: int) -> int:
+    """Minute the lent units are back at their source: class end plus the return trip."""
+    return max(move_start, class_end + return_minutes(pool, units))
+
+
+def contention_capacity(problem: RecoveryProblem) -> dict[tuple[str, str], int]:
+    """Units in stock per (home room, equipment type)."""
+    stock: dict[tuple[str, str], int] = defaultdict(int)
+    for pool in problem.campus.pools:
+        stock[(pool.room_id, pool.type)] += pool.units
+    return dict(stock)
+
+
+def home_use(problem: RecoveryProblem, placement: Placement) -> dict[str, int]:
+    """Units per type a class draws from the stock of its own room."""
+    short = remaining_equipment_need(problem, placement)
+    return {
+        eq_type: required - short.get(eq_type, 0)
+        for eq_type, required in placement.activity.required_equipment.items()
+        if required > short.get(eq_type, 0)
+    }
 
 
 def known_moves(

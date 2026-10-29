@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any, Literal
 
 from builders import asg, at, evolve, move
+from hypothesis import assume
 from hypothesis import strategies as st
 
 from smartcampus.domain.entities import (
@@ -283,3 +284,41 @@ def without_activity(plan: Plan, activity_id: str) -> Plan:
         cancelled=plan.cancelled | {activity_id},
         moves=tuple(m for m in plan.moves if m.activity_id != activity_id),
     )
+
+
+@st.composite
+def borrowing_problems(draw: st.DrawFn) -> RecoveryProblem:
+    """Every class needs gpus and fits any room type, and every pool can be moved."""
+    base = draw(problems(all_movable=True))
+    assume(base.campus.pools)
+    activities = tuple(
+        evolve(
+            a,
+            allowed_room_types=frozenset({"lab", "lecture"}),
+            required_equipment={"gpu": draw(st.integers(1, 4))},
+        )
+        for a in base.activities
+    )
+    pools = tuple(evolve(p, movable=True) for p in base.campus.pools)
+    return evolve(base, activities=activities, campus=evolve(base.campus, pools=pools))
+
+
+@st.composite
+def borrowing_plans(draw: st.DrawFn, problem: RecoveryProblem) -> Plan:
+    """Place every class and move in exactly the gpus its room lacks, so only stock can go wrong."""
+    plan = draw(plans(problem, modes=("assign",), with_moves=False))
+    moves = []
+    for placed in plan.assignments:
+        activity = problem.activity(placed.activity_id)
+        missing = activity.required_equipment["gpu"] - sum(
+            p.units for p in problem.campus.pools if p.room_id == placed.room_id
+        )
+        for pool in problem.campus.pools:
+            take = min(missing, pool.units)
+            if pool.room_id == placed.room_id or take <= 0:
+                continue
+            length = move_minutes(pool, take)
+            lead = draw(st.sampled_from([0, 10, 30]))
+            moves.append(move(pool.id, activity.id, take, placed.start_min - length - lead, length))
+            missing -= take
+    return evolve(plan, moves=tuple(moves))

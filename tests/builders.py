@@ -114,3 +114,28 @@ def make_problem(**overrides: Any) -> RecoveryProblem:
     }
     fields.update(overrides)
     return RecoveryProblem(**fields)
+
+
+def borrow_scenario(
+    units: int, home_need: int, home_start: int, move_start: int | None = None
+) -> tuple[RecoveryProblem, Plan]:
+    """A fixed class in A1 uses `home_need` of A1's 4 gpus from `home_start` (two slots).
+
+    The affected class `guest` runs in A2 at Tue 10:00-11:00 and borrows `units` gpus from A1.
+    A move of `units` takes `5 * units + 15` minutes, and so does the return trip.
+    """
+    home = make_activity(
+        id="home",
+        cohort_id="c2",
+        faculty_ids=("f2",),
+        required_equipment={"gpu": home_need},
+        room_id="A1",
+        start_min=home_start,
+    )
+    guest = make_activity(id="guest", required_equipment={"gpu": 2})
+    problem = make_problem(activities=(home, guest), movable_activity_ids=frozenset({"guest"}))
+    start = at(1, 9) if move_start is None else move_start
+    plan = make_plan(
+        asg("guest", "A2", at(1, 10)), moves=(move("gpu", "guest", units, start, 5 * units + 15),)
+    )
+    return problem, plan

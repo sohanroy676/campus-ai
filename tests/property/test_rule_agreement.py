@@ -4,11 +4,12 @@ import pytest
 from cp_helpers import allows, conflicting_rules
 from hypothesis import assume, given, settings
 from hypothesis import strategies as st
-from strategies import REPRESENTABLE_MODES, plans, problems
+from strategies import REPRESENTABLE_MODES, borrowing_plans, borrowing_problems, plans, problems
 
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
-from smartcampus.rules.registry import ALL_RULES, HardRule
+from smartcampus.rules.base import RuleId
+from smartcampus.rules.registry import ALL_RULES, RULES_BY_ID, HardRule
 from smartcampus.rules.validator import validate
 
 
@@ -52,3 +53,14 @@ def test_infeasible_core_names_at_least_one_really_violated_rule(data: st.DataOb
     core = conflicting_rules(problem, plan)
     assert core, "an infeasible plan must produce a non-empty core"
     assert core & violated
+
+
+@settings(max_examples=80)
+@given(data=st.data())
+def test_r4_check_and_encoding_agree_when_only_stock_can_go_wrong(data: st.DataObject) -> None:
+    problem = data.draw(borrowing_problems())
+    plan = data.draw(borrowing_plans(problem))
+    rule = RULES_BY_ID[RuleId.R4]
+    assert (rule.check(problem, plan) == []) == allows(problem, plan, [rule]), rule.check(
+        problem, plan
+    )

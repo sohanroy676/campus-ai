@@ -7,7 +7,17 @@ hit only rarely (mover cap, back-to-back travel, holds on moved pools).
 from collections.abc import Callable
 
 import pytest
-from builders import asg, at, evolve, make_activity, make_campus, make_plan, make_problem, move
+from builders import (
+    asg,
+    at,
+    borrow_scenario,
+    evolve,
+    make_activity,
+    make_campus,
+    make_plan,
+    make_problem,
+    move,
+)
 from cp_helpers import allows
 
 from smartcampus.domain.entities import SafetyHold
@@ -64,6 +74,11 @@ def gpu_hold(start: int, end: int) -> Scenario:
     return problem, plan
 
 
+def unplaced_move() -> Scenario:
+    problem, _ = borrow_scenario(2, 1, at(1, 13))
+    return problem, make_plan(cancelled=("guest",), moves=(move("gpu", "guest", 2, at(1, 9), 25),))
+
+
 CASES: list[tuple[RuleId, Callable[[], Scenario], bool]] = [
     # R5: concurrent moves are capped by staff; intervals are half-open
     (RuleId.R5, lambda: three_movers(3, (at(1, 9),) * 3), True),
@@ -82,6 +97,13 @@ CASES: list[tuple[RuleId, Callable[[], Scenario], bool]] = [
     (RuleId.R6, lambda: adjacent_classes(11, "B1", at(1, 9)), False),  # the other order
     (RuleId.R6, lambda: adjacent_classes(11, "A2", at(1, 11)), True),  # same building
     (RuleId.R6, lambda: adjacent_classes(60, "B1", at(1, 11, 30)), True),  # a free slot between
+    # R4: units in use at home plus units lent out fit the stock; the return trip counts
+    (RuleId.R4, lambda: borrow_scenario(2, 2, at(1, 10)), True),
+    (RuleId.R4, lambda: borrow_scenario(3, 2, at(1, 10)), False),
+    (RuleId.R4, lambda: borrow_scenario(3, 4, at(1, 11, 30)), True),  # back exactly at 11:30
+    (RuleId.R4, lambda: borrow_scenario(3, 4, at(1, 11)), False),
+    (RuleId.R4, lambda: borrow_scenario(4, 4, at(1, 13)), True),
+    (RuleId.R4, lambda: unplaced_move(), False),
     # R8: a held pool cannot be borrowed from during the hold
     (RuleId.R8, lambda: gpu_hold(at(1, 9, 30), at(1, 9, 45)), False),
     (RuleId.R8, lambda: gpu_hold(at(1, 8), at(1, 9)), True),  # ends as the move starts

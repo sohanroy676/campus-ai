@@ -33,7 +33,9 @@ def test_activities_needing_nothing_and_allowing_every_room_type_are_never_flagg
 
 
 @given(st.data())
-def test_generated_moves_only_ever_break_the_movable_flag(data: st.DataObject) -> None:
+def test_generated_moves_have_no_structure_errors_beyond_the_movable_flag(
+    data: st.DataObject,
+) -> None:
     problem = data.draw(problems())
     plan = data.draw(plans(problem))
     messages = [v.message for v in check(problem, plan)]
