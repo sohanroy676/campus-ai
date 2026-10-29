@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/solver-stages` is finished locally (5 commits, not pushed) and waits for review: R4 now covers source-side equipment contention, and `solver/` has the objective, `solve()` and infeasibility explanation. `domain/` and `rules/` R1 to R8 are on `main` (0d49964, CI green).
+`feature/sim-and-greedy`: assumption-19 tie-break, the `sim/` event store, the scenario loader, the greedy baseline and CLI `run` (Gate 1). `main` = `origin/main` = 18b6c4b, CI green. It holds `domain/`, `rules/` R1 to R8 (R4 with source-side equipment contention) and `solver/` (objective, `solve()`, infeasibility explanation).
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -21,7 +21,8 @@
 - Repo-local git identity is set to sohanroy676.
 
 ## Blockers / open questions
-- Assumptions in `docs/model-spec.md` section 7 (now 1 to 20) still need the user's confirmation, except 3, which the user resolved by extending R4. Most important: 19 (equal-cost start times).
+- Assumptions in `docs/model-spec.md` section 7 (1 to 20) still need the user's confirmation, except 3 (resolved by extending R4) and 19 (resolved: add a tie-break for distance from the original start, after T; 20 stays as is).
+- Decisions for this branch: scenario file is a serialized `RecoveryProblem` with explicit `window` and `movable_activity_ids` (`impact/` deferred); event `version` is a dense counter from 0 and a `PlanApplied` built on an older version is rejected as stale.
 
 ## Next step
-Review, then push and open a PR only with approval and watch CI with Monitor (include the secrets job). After that: event-log simulator (`sim/`), greedy baseline, scenario loader and CLI `run`.
+Finish `feature/sim-and-greedy`, then push and open a PR only with approval and watch CI with Monitor (include the secrets job).

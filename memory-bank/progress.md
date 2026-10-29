@@ -23,7 +23,7 @@
   - 219 tests: unit, Hypothesis properties, and check/encoding agreement tests (validator verdict equals CP-SAT feasibility). `rules/` coverage is about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src` and `uv run pytest` all pass
 
-- R4 source contention and the lexicographic solver on `feature/solver-stages` (5 commits, not pushed) — 2026-10-29
+- R4 source contention and the lexicographic solver on `feature/solver-stages` (merged and pushed, `main` = `origin/main` = 18b6c4b; CI green: `checks` and `secrets`) — 2026-10-29
   - R4: a moved unit is unavailable at its source until the borrowing class ends plus the return trip (same time as outbound; availability only, no mover, no K cost); per (room, type) stock check, check and CP-SAT encoding in agreement
   - `solver/objective.py`: `StageValues` (C, P, D, K, T), `evaluate()` reference score, `stage_expressions()`
   - `solver/solve.py`: `solve()` runs the five stages (10/10/4/4/2 s, workers 1, seed 42), validates the plan; `solver/explain.py` names conflicting rules for bad input
@@ -32,10 +32,9 @@
 
 ## In progress
 
-- `feature/solver-stages` awaits review. Push, PR and CI only with approval.
+- `feature/sim-and-greedy`: assumption-19 tie-break, `sim/` event store, scenario loader, greedy baseline, CLI `run`. Push, PR and CI only with approval.
 
 ## Next
 
-- Decide spec assumption 19: equal-cost start times (the solver may pull classes earlier) and whether to add a tie-break for distance from the original start.
-- Confirm the other spec assumptions in `docs/model-spec.md` section 7.
-- Remaining ROADMAP "Now" items: officer and facilities interviews, event-log simulator, greedy baseline, CLI `run` end to end (needs a scenario loader).
+- Confirm the other spec assumptions in `docs/model-spec.md` section 7 (19 is decided: tie-break added; 20 stays).
+- Remaining ROADMAP "Now" items: officer and facilities interviews.
