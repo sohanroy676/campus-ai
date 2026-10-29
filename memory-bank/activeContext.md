@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/model-spec-schemas` is finished locally (6 commits, not pushed) and waits for review: spec doc, ADR 0002, `domain/`, and `rules/` R1 to R8 with a validator check and a CP-SAT encoding each.
+`feature/solver-stages`: extend R4 with source-side equipment contention (return trip = outbound time, availability only), then build the lexicographic solver in `solver/` (objective stages C, P, D, K, T; 10/10/4/4/2 s; workers=1, seed 42). `domain/` and `rules/` R1 to R8 are on `main` (0d49964, CI green).
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -20,7 +20,7 @@
 - Repo-local git identity is set to sohanroy676.
 
 ## Blockers / open questions
-- The 12 assumptions in `docs/model-spec.md` section 7 need the user's confirmation. Most important is 3: nothing stops the same equipment units being used in their home room and moved elsewhere (no rule covers it, so none was invented).
+- Assumptions in `docs/model-spec.md` section 7 (now 1 to 18) still need the user's confirmation, except 3, which the user resolved by extending R4.
 
 ## Next step
-Review, then push and open a PR only with approval and watch CI with Monitor (include the secrets job). After that: the lexicographic solver stages and objective in `solver/`, built on `rules.variables`.
+Implement per the plan (R4 extension, objective, solve). Push and open a PR only with approval and watch CI with Monitor (include the secrets job).

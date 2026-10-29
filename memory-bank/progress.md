@@ -16,7 +16,7 @@
 - Docs, agent rules and CI config under version control (commit 765732d) — 2026-10-29
 - CI on the first push: `checks` passed. `secrets` (gitleaks) failed falsely on the root-commit range (0 bytes scanned, not a leak); `ci.yml` left unchanged by decision.
 
-- Model spec, domain schemas and hard-rule library on `feature/model-spec-schemas` (6 commits, not pushed) — 2026-10-29
+- Model spec, domain schemas and hard-rule library on `feature/model-spec-schemas` (merged to `main` and pushed, 0d49964; CI green: `checks` and `secrets`) — 2026-10-29
   - `docs/model-spec.md` (time model, variables, R1 to R8, objective C/P/D/K/T, solver settings, 12 numbered assumptions) and ADR 0002
   - `domain/`: time (30-min slots, Mon to Fri 08:00 to 18:00), entities, events, plan, problem
   - `rules/`: R1 to R8, each with a `check` and a CP-SAT `post` built on shared predicates in `_shared.py`; `variables.py` (decision variables and assumption literals), `registry.py`, `validator.py`
@@ -25,10 +25,9 @@
 
 ## In progress
 
-- Branch `feature/model-spec-schemas` awaits review. Push, PR and CI only with approval.
+- `feature/solver-stages`: extend R4 with source contention, then the lexicographic solver (`solver/`). Push, PR and CI only with approval.
 
 ## Next
 
-- Confirm the spec assumptions in `docs/model-spec.md` section 7 (especially 3: equipment source contention).
-- Re-check the gitleaks `secrets` job on the first PR (valid commit range).
+- Confirm the remaining spec assumptions in `docs/model-spec.md` section 7 (3 is resolved: R4 now covers source contention).
 - Remaining ROADMAP "Now" items: officer and facilities interviews, event-log simulator, greedy baseline, first CP-SAT model (lexicographic stages and objective, built on `rules.variables`).
