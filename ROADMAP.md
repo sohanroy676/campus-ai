@@ -1,8 +1,6 @@
 # Roadmap
 
 ## Now (weeks 1–4: v0.1 and v0.2)
-- Model spec: decision variables, the 8 hard rules, and the lexicographic objective.
-- Pydantic schemas for every entity, event and plan.
 - Interviews with a timetabling officer and a facilities manager.
 - Event-log simulator, greedy baseline and a first CP-SAT model, run end to end from the CLI.
 - Gate 1: one scenario runs end to end, baseline included.
