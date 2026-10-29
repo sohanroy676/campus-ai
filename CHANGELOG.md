@@ -9,11 +9,16 @@ Format follows Keep a Changelog. Generated from Conventional Commits — regener
 - Add time model and core schemas
 - Add hard-rule checks and plan validator
 - Add CP-SAT encodings for hard rules
+- Add source-side equipment contention to R4
+- Add lexicographic objective stages and scorer
+- Add lexicographic solve and infeasibility explanation
 
 ### Documentation
 - Record scaffold status and add changelog config
 - Record scaffold merge and push
 - Add model spec and ADR 0002
+- Update progress, roadmap and changelog
+- Extend R4 in the spec and refresh memory-bank
 
 ### Maintenance
 - Add project docs, agent rules and CI config

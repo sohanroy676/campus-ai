@@ -2,7 +2,7 @@
 
 ## Now (weeks 1–4: v0.1 and v0.2)
 - Interviews with a timetabling officer and a facilities manager.
-- Event-log simulator, greedy baseline and a first CP-SAT model, run end to end from the CLI.
+- Event-log simulator and greedy baseline, then run one scenario end to end from the CLI (the CP-SAT solver is done).
 - Gate 1: one scenario runs end to end, baseline included.
 
 ## Next (weeks 5–10: v0.3 to v0.5)

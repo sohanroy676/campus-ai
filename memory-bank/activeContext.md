@@ -3,13 +3,14 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/solver-stages`: extend R4 with source-side equipment contention (return trip = outbound time, availability only), then build the lexicographic solver in `solver/` (objective stages C, P, D, K, T; 10/10/4/4/2 s; workers=1, seed 42). `domain/` and `rules/` R1 to R8 are on `main` (0d49964, CI green).
+`feature/solver-stages` is finished locally (5 commits, not pushed) and waits for review: R4 now covers source-side equipment contention, and `solver/` has the objective, `solve()` and infeasibility explanation. `domain/` and `rules/` R1 to R8 are on `main` (0d49964, CI green).
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
 - CI on that first push: `checks` passed. `secrets` (gitleaks) failed falsely: the push held a root commit, so the range `765732d^..b56e88c` did not exist and 0 bytes were scanned. Not a leak. `ci.yml` is deliberately unchanged. The first PR from this branch is the first real test of the secrets job.
 - Model spec inputs are settled and written into `docs/model-spec.md`: 30-minute slots, Mon to Fri, 08:00 to 18:00 (20 slots a day, 100 a week), lexicographic objective C, P, D, K, T.
 - Each rule is `check` + `post` over shared predicates (`rules/_shared.py`). `tests/property/test_rule_agreement.py` and `tests/unit/test_rule_encodings.py` assert the validator verdict equals CP-SAT feasibility. Do not edit one side without the other.
+- Solver: `solve(problem, SolverSettings())`; tests pass small `stage_seconds`. `stage_expressions` and `evaluate` share per-placement cost functions in `solver/objective.py`; `tests/property/test_objective_props.py` asserts they agree. Hint each CP-SAT variable once (a duplicate hint makes the model invalid).
 - ortools 9.15: use the snake_case API (`new_bool_var`, `add`, `only_enforce_if`, ...). The CamelCase methods are untyped and fail strict mypy.
 - Plans may be malformed on purpose (both assigned and cancelled, unknown ids) so R1 and R4 can report them; the schema does not reject those.
 - Test helpers live in `tests/builders.py`, `tests/cp_helpers.py` and `tests/property/strategies.py` (`pythonpath` set in `pyproject.toml`).
@@ -20,7 +21,7 @@
 - Repo-local git identity is set to sohanroy676.
 
 ## Blockers / open questions
-- Assumptions in `docs/model-spec.md` section 7 (now 1 to 18) still need the user's confirmation, except 3, which the user resolved by extending R4.
+- Assumptions in `docs/model-spec.md` section 7 (now 1 to 20) still need the user's confirmation, except 3, which the user resolved by extending R4. Most important: 19 (equal-cost start times).
 
 ## Next step
-Implement per the plan (R4 extension, objective, solve). Push and open a PR only with approval and watch CI with Monitor (include the secrets job).
+Review, then push and open a PR only with approval and watch CI with Monitor (include the secrets job). After that: event-log simulator (`sim/`), greedy baseline, scenario loader and CLI `run`.

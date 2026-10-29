@@ -23,11 +23,19 @@
   - 219 tests: unit, Hypothesis properties, and check/encoding agreement tests (validator verdict equals CP-SAT feasibility). `rules/` coverage is about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src` and `uv run pytest` all pass
 
+- R4 source contention and the lexicographic solver on `feature/solver-stages` (5 commits, not pushed) — 2026-10-29
+  - R4: a moved unit is unavailable at its source until the borrowing class ends plus the return trip (same time as outbound; availability only, no mover, no K cost); per (room, type) stock check, check and CP-SAT encoding in agreement
+  - `solver/objective.py`: `StageValues` (C, P, D, K, T), `evaluate()` reference score, `stage_expressions()`
+  - `solver/solve.py`: `solve()` runs the five stages (10/10/4/4/2 s, workers 1, seed 42), validates the plan; `solver/explain.py` names conflicting rules for bad input
+  - 279 tests; brute-force property test shows the solver's result equals the best valid plan; mutation probes catch dropped constraints. `rules/` and `solver/` coverage about 100%
+  - Checked locally: `ruff check`, `ruff format --check`, `mypy src`, `uv run pytest` all pass
+
 ## In progress
 
-- `feature/solver-stages`: extend R4 with source contention, then the lexicographic solver (`solver/`). Push, PR and CI only with approval.
+- `feature/solver-stages` awaits review. Push, PR and CI only with approval.
 
 ## Next
 
-- Confirm the remaining spec assumptions in `docs/model-spec.md` section 7 (3 is resolved: R4 now covers source contention).
-- Remaining ROADMAP "Now" items: officer and facilities interviews, event-log simulator, greedy baseline, first CP-SAT model (lexicographic stages and objective, built on `rules.variables`).
+- Decide spec assumption 19: equal-cost start times (the solver may pull classes earlier) and whether to add a tie-break for distance from the original start.
+- Confirm the other spec assumptions in `docs/model-spec.md` section 7.
+- Remaining ROADMAP "Now" items: officer and facilities interviews, event-log simulator, greedy baseline, CLI `run` end to end (needs a scenario loader).
