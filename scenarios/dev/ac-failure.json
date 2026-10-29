@@ -1,0 +1,154 @@
+{
+  "campus": {
+    "buildings": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      }
+    ],
+    "rooms": [
+      {
+        "id": "AI-Lab-01",
+        "building_id": "A",
+        "type": "lab",
+        "capacity": 30,
+        "step_free": true
+      },
+      {
+        "id": "AI-Lab-02",
+        "building_id": "A",
+        "type": "lab",
+        "capacity": 30,
+        "step_free": true
+      },
+      {
+        "id": "Lec-A1",
+        "building_id": "A",
+        "type": "lecture",
+        "capacity": 60,
+        "step_free": true
+      },
+      {
+        "id": "Lec-B1",
+        "building_id": "B",
+        "type": "lecture",
+        "capacity": 40,
+        "step_free": false
+      }
+    ],
+    "pools": [
+      {
+        "id": "gpu-01",
+        "type": "gpu",
+        "room_id": "AI-Lab-01",
+        "units": 4,
+        "movable": true,
+        "move_minutes_per_unit": 5
+      }
+    ],
+    "walks": [
+      {
+        "a": "A",
+        "b": "B",
+        "minutes": 5
+      }
+    ]
+  },
+  "cohorts": [
+    {
+      "id": "cs1",
+      "size": 40,
+      "step_free_required": false
+    },
+    {
+      "id": "cs2",
+      "size": 28,
+      "step_free_required": false
+    },
+    {
+      "id": "cs3",
+      "size": 25,
+      "step_free_required": false
+    }
+  ],
+  "faculty": [
+    {
+      "id": "rao"
+    },
+    {
+      "id": "iyer"
+    }
+  ],
+  "activities": [
+    {
+      "id": "ml-lab",
+      "cohort_id": "cs3",
+      "faculty_ids": [
+        "rao"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "AI-Lab-01",
+      "start_min": 2040
+    },
+    {
+      "id": "net-lab",
+      "cohort_id": "cs2",
+      "faculty_ids": [
+        "iyer"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "AI-Lab-02",
+      "start_min": 2040
+    },
+    {
+      "id": "data-lecture",
+      "cohort_id": "cs1",
+      "faculty_ids": [
+        "rao"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "Lec-A1",
+      "start_min": 2220
+    }
+  ],
+  "faults": [
+    {
+      "id": "ac-failure-lab01",
+      "room_id": "AI-Lab-01",
+      "kind": "ac_failure",
+      "interval": {
+        "start": 2040,
+        "end": 2280
+      }
+    }
+  ],
+  "holds": [],
+  "movable_activity_ids": [
+    "data-lecture",
+    "ml-lab",
+    "net-lab"
+  ],
+  "window": {
+    "start": 1920,
+    "end": 2520
+  },
+  "plan_time_min": 1920,
+  "staff_available": 2,
+  "prior_moves_this_week": {}
+}
