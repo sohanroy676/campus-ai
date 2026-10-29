@@ -14,6 +14,7 @@ from smartcampus.generator.scenario import (
     load_scenario,
     save_scenario,
 )
+from smartcampus.impact.derive import derive_recovery
 
 
 def disrupted() -> RecoveryProblem:
@@ -95,8 +96,9 @@ def test_a_dangling_reference_is_rejected(tmp_path: Path) -> None:
 
 def test_a_long_list_of_errors_is_cut_short(tmp_path: Path) -> None:
     data = json.loads(dump_scenario(make_problem()))
-    for key in ("campus", "cohorts", "faculty", "activities", "movable_activity_ids", "window"):
+    for key in ("campus", "cohorts", "faculty", "activities", "plan_time_min"):
         del data[key]
+    data["unexpected"] = 1  # the sixth problem
     path = tmp_path / "s.json"
     path.write_text(json.dumps(data), encoding="utf-8")
     with pytest.raises(ScenarioError, match=r"\.\.\. and 1 more"):
@@ -108,3 +110,48 @@ def test_a_top_level_list_is_rejected(tmp_path: Path) -> None:
     path.write_text("[]", encoding="utf-8")
     with pytest.raises(ScenarioError, match="not a valid scenario"):
         load_scenario(path)
+
+
+def without_recovery_fields(problem_json: str) -> dict[str, object]:
+    data = json.loads(problem_json)
+    del data["window"], data["movable_activity_ids"]
+    return data
+
+
+def test_a_file_without_window_and_movable_ids_gets_them_derived(tmp_path: Path) -> None:
+    problem = disrupted()
+    path = tmp_path / "s.json"
+    path.write_text(json.dumps(without_recovery_fields(dump_scenario(problem))), encoding="utf-8")
+    loaded = load_scenario(path)
+    assert loaded == derive_recovery(problem)
+    assert loaded.movable_activity_ids == {"act1"} and loaded.window.start == at(1, 8)
+
+
+@pytest.mark.parametrize("keep", ["window", "movable_activity_ids"])
+def test_giving_only_one_of_window_and_movable_ids_is_an_error(tmp_path: Path, keep: str) -> None:
+    data = json.loads(dump_scenario(make_problem()))
+    del data["window" if keep == "movable_activity_ids" else "movable_activity_ids"]
+    path = tmp_path / "s.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ScenarioError, match="both window and movable_activity_ids, or neither"):
+        load_scenario(path)
+
+
+def test_a_derived_scenario_with_a_fault_in_an_unknown_room_is_rejected(tmp_path: Path) -> None:
+    data = without_recovery_fields(dump_scenario(disrupted()))
+    data["faults"][0]["room_id"] = "Z9"  # type: ignore[index]
+    path = tmp_path / "s.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ScenarioError, match="unknown room"):
+        load_scenario(path)
+
+
+def test_explicit_window_and_movable_ids_are_kept_as_written(tmp_path: Path) -> None:
+    problem = evolve(
+        disrupted(),
+        movable_activity_ids=frozenset(),
+        window=Interval(start=at(1, 9), end=at(1, 10)),
+    )
+    path = tmp_path / "s.json"
+    save_scenario(problem, path)
+    assert load_scenario(path) == problem

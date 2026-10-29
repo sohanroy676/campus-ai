@@ -143,3 +143,14 @@ def test_a_solver_that_finds_nothing_in_time_exits_1(
     monkeypatch.setattr("smartcampus.cli.run_scenario", too_slow)
     result = run(DEMO, "--db", tmp_path / "c.db")
     assert result.exit_code == 1 and "no solution found within 10 s" in result.output
+
+
+def test_a_scenario_without_window_and_movable_ids_runs(tmp_path: Path) -> None:
+    data = json.loads(DEMO.read_text(encoding="utf-8"))
+    del data["window"], data["movable_activity_ids"]
+    path = tmp_path / "derived.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    result = run(path, "--db", tmp_path / "c.db")
+    assert result.exit_code == 0, result.output
+    assert "4 class(es) to recover" in result.output  # the fixed early lab is now movable too
+    assert "ml-lab: AI-Lab-01 Tue 10:00 -> AI-Lab-02 Tue 09:00" in result.output

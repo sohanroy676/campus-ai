@@ -4,6 +4,7 @@ Solver settings are the defaults: num_workers=1, random_seed=42. If a number her
 objective, a rule or the solver changed: decide whether that is intended before updating it.
 """
 
+import json
 from pathlib import Path
 
 from builders import at
@@ -56,3 +57,18 @@ def test_greedy_disturbs_a_second_class_because_it_does_not_look_ahead() -> None
 
 def test_joint_beats_greedy_on_the_demo() -> None:
     assert run(Method.JOINT).values < run(Method.GREEDY).values
+
+
+def test_deriving_the_recovery_gives_the_same_scores_as_the_written_one(tmp_path: Path) -> None:
+    data = json.loads(DEMO.read_text(encoding="utf-8"))
+    del data["window"], data["movable_activity_ids"]
+    path = tmp_path / "derived.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    problem = load_scenario(path)
+    assert problem.movable_activity_ids == {"ds-lab", "ml-lab", "net-lab", "data-lecture"}
+    for method, expected in (
+        (Method.JOINT, StageValues(0, 26, 0, 30, 60, 1)),
+        (Method.GREEDY, StageValues(0, 55, 0, 30, 60, 2)),
+    ):
+        with EventStore() as store:
+            assert run_scenario(problem, method, store, SolverSettings()).values == expected
