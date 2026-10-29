@@ -6,6 +6,8 @@ each required equipment type. Pools with `movable = false` never move.
 
 from collections import Counter
 
+from ortools.sat.python import cp_model
+
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import (
@@ -16,6 +18,7 @@ from smartcampus.rules._shared import (
     remaining_equipment_need,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def has_wrong_type(placement: Placement) -> bool:
@@ -84,3 +87,29 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                 )
             )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    lit = ctx.rule_lit[RuleId.R4]
+    pools = ctx.problem.campus.pools
+    for option in ctx.all_options():
+        if has_wrong_type(option):
+            ctx.forbid(option, RuleId.R4)
+        for eq_type, missing in remaining_equipment_need(ctx.problem, option).items():
+            if option.var is None:
+                ctx.forbid(option, RuleId.R4)  # unaffected activities cannot get moved units
+                continue
+            moved_in = [
+                ctx.units[(option.activity.id, p.id)]
+                for p in pools
+                if counts_as_moved_in(p, eq_type, option.room.id)
+            ]
+            if moved_in:
+                ctx.model.add(cp_model.LinearExpr.sum(moved_in) >= missing).only_enforce_if(
+                    [option.var, lit]
+                )
+            else:
+                ctx.forbid(option, RuleId.R4)
+    for (_, pool_id), units in ctx.units.items():
+        if not ctx.problem.campus.pool(pool_id).movable:
+            ctx.model.add(units == 0).only_enforce_if(lit)

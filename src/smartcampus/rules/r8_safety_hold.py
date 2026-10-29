@@ -9,13 +9,14 @@ from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import (
     Placement,
+    earliest_borrow_start,
     known_moves,
     placements,
     plan_placements,
-    pool_hold_overlaps,
     room_hold_overlaps,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def is_on_hold(problem: RecoveryProblem, placement: Placement) -> bool:
@@ -36,7 +37,8 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
     placed = plan_placements(problem, plan)
     for m, pool, act in known_moves(problem, plan):
         for p in placed:
-            if p.activity.id == act.id and pool_hold_overlaps(problem, pool.id, m.start_min, p.end):
+            earliest = earliest_borrow_start(problem, pool.id, p.end)
+            if p.activity.id == act.id and earliest is not None and m.start_min < earliest:
                 out.append(
                     Violation(
                         RuleId.R8,
@@ -45,3 +47,17 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                     )
                 )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    lit = ctx.rule_lit[RuleId.R8]
+    for option in ctx.all_options():
+        if is_on_hold(ctx.problem, option):
+            ctx.forbid(option, RuleId.R8)
+    for (activity_id, pool_id), moved in ctx.moved.items():
+        for option in ctx.options[activity_id]:
+            earliest = earliest_borrow_start(ctx.problem, pool_id, option.end)
+            if earliest is not None and option.var is not None:
+                ctx.model.add(ctx.move_start[(activity_id, pool_id)] >= earliest).only_enforce_if(
+                    [option.var, moved, lit]
+                )

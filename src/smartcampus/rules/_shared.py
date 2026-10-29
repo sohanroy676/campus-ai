@@ -4,6 +4,7 @@ Each rule's meaning is written once here or in its own module; `check` and `post
 """
 
 from dataclasses import dataclass
+from typing import overload
 
 from ortools.sat.python import cp_model
 
@@ -110,6 +111,24 @@ def pool_hold_overlaps(problem: RecoveryProblem, pool_id: str, start: int, end: 
     )
 
 
+def earliest_borrow_start(problem: RecoveryProblem, pool_id: str, class_end: int) -> int | None:
+    """Earliest minute a move of `pool_id` may start for a class ending at `class_end`.
+
+    A pool on hold cannot be moved while the hold overlaps the borrow, which runs from the move
+    start until the class ends. None means no hold gets in the way.
+    """
+    return max(
+        (
+            h.interval.end
+            for h in problem.holds
+            if h.target_kind == "equipment"
+            and h.target_id == pool_id
+            and h.interval.start < class_end
+        ),
+        default=None,
+    )
+
+
 def usable_present_units(
     problem: RecoveryProblem, room_id: str, equipment_type: str, start: int, end: int
 ) -> int:
@@ -141,8 +160,19 @@ def counts_as_moved_in(pool: EquipmentPool, equipment_type: str, room_id: str) -
     return pool.type == equipment_type and pool.room_id != room_id
 
 
-def move_minutes(pool: EquipmentPool, units: int) -> int:
-    """Time one mover needs to carry `units` of `pool` plus the setup buffer."""
+@overload
+def move_minutes(pool: EquipmentPool, units: int) -> int: ...
+
+
+@overload
+def move_minutes(pool: EquipmentPool, units: cp_model.IntVar) -> cp_model.LinearExpr: ...
+
+
+def move_minutes(pool: EquipmentPool, units: int | cp_model.IntVar) -> int | cp_model.LinearExpr:
+    """Time one mover needs to carry `units` of `pool` plus the setup buffer.
+
+    Works on plain ints (checks) and on CP-SAT variables (encodings) so the formula lives once.
+    """
     return units * pool.move_minutes_per_unit + SETUP_BUFFER_MIN
 
 

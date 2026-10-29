@@ -6,6 +6,7 @@ from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import valid_starts
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
@@ -50,3 +51,10 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                 )
             )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    lit = ctx.rule_lit[RuleId.R1]
+    for activity_id in sorted(ctx.cancelled):
+        placed = [o.var for o in ctx.options[activity_id] if o.var is not None]
+        ctx.model.add(sum(placed) + ctx.cancelled[activity_id] == 1).only_enforce_if(lit)

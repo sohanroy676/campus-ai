@@ -16,6 +16,7 @@ from smartcampus.rules import (
     r8_safety_hold,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 @dataclass(frozen=True)
@@ -23,17 +24,23 @@ class HardRule:
     id: RuleId
     name: str
     check: Callable[[RecoveryProblem, Plan], list[Violation]]
+    post: Callable[[DecisionVars], None]
 
 
 ALL_RULES: tuple[HardRule, ...] = (
-    HardRule(RuleId.R1, "assignment", r1_assignment.check),
-    HardRule(RuleId.R2, "room_conflict", r2_room_conflict.check),
-    HardRule(RuleId.R3, "capacity", r3_capacity.check),
-    HardRule(RuleId.R4, "room_type_and_equipment", r4_room_type_and_equipment.check),
-    HardRule(RuleId.R5, "move_lead_time", r5_move_lead_time.check),
-    HardRule(RuleId.R6, "people_conflict", r6_people_conflict.check),
-    HardRule(RuleId.R7, "accessibility", r7_accessibility.check),
-    HardRule(RuleId.R8, "safety_hold", r8_safety_hold.check),
+    HardRule(RuleId.R1, "assignment", r1_assignment.check, r1_assignment.post),
+    HardRule(RuleId.R2, "room_conflict", r2_room_conflict.check, r2_room_conflict.post),
+    HardRule(RuleId.R3, "capacity", r3_capacity.check, r3_capacity.post),
+    HardRule(
+        RuleId.R4,
+        "room_type_and_equipment",
+        r4_room_type_and_equipment.check,
+        r4_room_type_and_equipment.post,
+    ),
+    HardRule(RuleId.R5, "move_lead_time", r5_move_lead_time.check, r5_move_lead_time.post),
+    HardRule(RuleId.R6, "people_conflict", r6_people_conflict.check, r6_people_conflict.post),
+    HardRule(RuleId.R7, "accessibility", r7_accessibility.check, r7_accessibility.post),
+    HardRule(RuleId.R8, "safety_hold", r8_safety_hold.check, r8_safety_hold.post),
 )
 
 RULES_BY_ID: dict[RuleId, HardRule] = {rule.id: rule for rule in ALL_RULES}

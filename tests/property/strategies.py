@@ -134,7 +134,7 @@ def problems(draw: st.DrawFn, *, all_movable: bool = False) -> RecoveryProblem:
         holds=tuple(holds),
         movable_activity_ids=movable,
         window=WINDOW,
-        plan_time_min=at(TUE, 7) + 5 * draw(st.integers(0, 80)),
+        plan_time_min=at(TUE, 7) + 5 * draw(st.integers(0, 24)),
         staff_available=draw(st.integers(1, 2)),
     )
 
@@ -224,8 +224,24 @@ def plans(
     cancelled: set[str] = set()
     for aid in sorted(problem.movable_activity_ids):
         starts = valid_starts(problem, problem.activity(aid))
+        duration = problem.activity(aid).duration_min
+        # Starts that touch an earlier placement exactly, so back-to-back cases are common.
+        adjacent = sorted(
+            {
+                s
+                for earlier in assignments
+                for s in (
+                    earlier.start_min + problem.activity(earlier.activity_id).duration_min,
+                    earlier.start_min - duration,
+                )
+                if s in starts
+            }
+        )
+        start_choice = st.sampled_from(starts)
+        if adjacent:
+            start_choice = st.one_of(start_choice, st.sampled_from(adjacent))
+        pick = st.tuples(st.sampled_from(room_ids), start_choice)
         mode = draw(st.sampled_from(modes))
-        pick = st.tuples(st.sampled_from(room_ids), st.sampled_from(starts))
         if mode in ("assign", "both", "twice"):
             assignments.append(asg(aid, *draw(pick)))
         if mode == "twice":
@@ -236,12 +252,18 @@ def plans(
             cancelled.add(aid)
     moves: list[Any] = []
     if with_moves:
+        class_start = {a.activity_id: a.start_min for a in assignments}
         for aid in sorted(problem.movable_activity_ids):
             for pool in problem.campus.pools:
                 if draw(st.booleans()):
                     units = draw(st.integers(1, pool.units))
-                    start = problem.plan_time_min + 5 * draw(st.integers(-6, 60))
-                    moves.append(move(pool.id, aid, units, start, move_minutes(pool, units)))
+                    length = move_minutes(pool, units)
+                    if aid in class_start and draw(st.booleans()):
+                        # Finish just before class, so only the mover cap can go wrong.
+                        start = class_start[aid] - length - draw(st.sampled_from([0, 0, 5, 10, 30]))
+                    else:
+                        start = problem.plan_time_min + 5 * draw(st.integers(-6, 60))
+                    moves.append(move(pool.id, aid, units, start, length))
     if wild:
         for index in draw(st.lists(st.integers(0, len(MUTATIONS) - 1), max_size=2)):
             MUTATIONS[index](problem, draw, assignments, cancelled, moves)

@@ -4,6 +4,7 @@ from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import Placement, placements
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def lacks_step_free(problem: RecoveryProblem, placement: Placement) -> bool:
@@ -23,3 +24,9 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
         for p in placements(problem, plan)
         if lacks_step_free(problem, p)
     ]
+
+
+def post(ctx: DecisionVars) -> None:
+    for option in ctx.all_options():
+        if lacks_step_free(ctx.problem, option):
+            ctx.forbid(option, RuleId.R7)

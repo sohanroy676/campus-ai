@@ -4,6 +4,9 @@ Two classes with a common cohort or faculty member may not overlap. If one ends 
 other starts, their buildings must be at most 10 minutes apart.
 """
 
+from collections import defaultdict
+from itertools import combinations
+
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import (
@@ -13,6 +16,7 @@ from smartcampus.rules._shared import (
     placements,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def shares_person(first: Placement, second: Placement) -> bool:
@@ -53,3 +57,21 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                     )
                 )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    people: dict[str, list[Placement]] = defaultdict(list)
+    for option in ctx.all_options():
+        a = option.activity
+        for person in (f"cohort:{a.cohort_id}", *(f"faculty:{f}" for f in a.faculty_ids)):
+            people[person].append(option)
+    for options in people.values():
+        by_slot: dict[int, list[Placement]] = defaultdict(list)
+        for option in options:
+            for slot in option.slots:
+                by_slot[slot].append(option)
+        for group in by_slot.values():
+            ctx.at_most_one(group, RuleId.R6)
+    for first, second in combinations(list(ctx.all_options()), 2):
+        if shares_person(first, second) and is_too_far(ctx.problem, first, second):
+            ctx.forbid_together(first, second, RuleId.R6)

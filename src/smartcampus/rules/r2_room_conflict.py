@@ -1,5 +1,7 @@
 """R2 room_conflict: a room hosts at most one activity per slot, and a closed room hosts none."""
 
+from collections import defaultdict
+
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import (
@@ -10,6 +12,7 @@ from smartcampus.rules._shared import (
     room_hold_overlaps,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def is_closed(problem: RecoveryProblem, placement: Placement) -> bool:
@@ -45,3 +48,14 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                     )
                 )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    by_room_slot: dict[tuple[str, int], list[Placement]] = defaultdict(list)
+    for option in ctx.all_options():
+        if is_closed(ctx.problem, option):
+            ctx.forbid(option, RuleId.R2)
+        for slot in option.slots:
+            by_room_slot[(option.room.id, slot)].append(option)
+    for options in by_room_slot.values():
+        ctx.at_most_one(options, RuleId.R2)

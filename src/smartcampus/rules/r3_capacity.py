@@ -4,6 +4,7 @@ from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules._shared import Placement, placements
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def is_too_small(problem: RecoveryProblem, placement: Placement) -> bool:
@@ -22,3 +23,9 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
         for p in placements(problem, plan)
         if is_too_small(problem, p)
     ]
+
+
+def post(ctx: DecisionVars) -> None:
+    for option in ctx.all_options():
+        if is_too_small(ctx.problem, option):
+            ctx.forbid(option, RuleId.R3)

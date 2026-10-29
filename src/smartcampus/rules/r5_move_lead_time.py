@@ -12,6 +12,7 @@ from smartcampus.rules._shared import (
     plan_placements,
 )
 from smartcampus.rules.base import RuleId, Violation
+from smartcampus.rules.variables import DecisionVars
 
 
 def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
@@ -48,3 +49,27 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                 )
             )
     return out
+
+
+def post(ctx: DecisionVars) -> None:
+    model, problem = ctx.model, ctx.problem
+    lit = ctx.rule_lit[RuleId.R5]
+    intervals = []
+    for key, units in ctx.units.items():
+        activity_id, pool_id = key
+        moved, start = ctx.moved[key], ctx.move_start[key]
+        pool = problem.campus.pool(pool_id)
+        length = move_minutes(pool, units)
+        end = model.new_int_var(0, WEEK_END_MIN + move_minutes(pool, pool.units), "move_end")
+        model.add(end == start + length)  # a definition; the rule's limits are enforced below
+        model.add(start >= problem.plan_time_min).only_enforce_if([moved, lit])
+        model.add(end <= WEEK_END_MIN).only_enforce_if([moved, lit])
+        for option in ctx.options[activity_id]:
+            if option.var is not None:
+                model.add(end <= option.start).only_enforce_if([option.var, moved, lit])
+        intervals.append(
+            model.new_optional_interval_var(
+                start, length, end, ctx.and_literal(moved, lit), f"move_{activity_id}_{pool_id}"
+            )
+        )
+    model.add_cumulative(intervals, [1] * len(intervals), problem.staff_available)
