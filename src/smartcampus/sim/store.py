@@ -34,6 +34,27 @@ class CorruptLogError(Exception):
     """The stored log is not a dense run of versions 0, 1, 2, ... that replays cleanly."""
 
 
+def _is_event_store(path: Path) -> bool:
+    """True for an empty file or a SQLite database that has an `events` table."""
+    if not path.is_file():
+        return False
+    if path.stat().st_size == 0:
+        return True
+    try:
+        conn = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
+        try:
+            return (
+                conn.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'events'"
+                ).fetchone()
+                is not None
+            )
+        finally:
+            conn.close()
+    except sqlite3.DatabaseError:
+        return False
+
+
 class EventStore:
     def __init__(self, path: str | Path = ":memory:") -> None:
         if str(path) != ":memory:":
@@ -47,6 +68,17 @@ class EventStore:
         except Exception:
             self._conn.close()
             raise
+
+    @classmethod
+    def create_fresh(cls, path: str | Path) -> Self:
+        """A new, empty log at `path`. An earlier event store there is replaced; any other file
+        is left alone and raises `ValueError`."""
+        target = Path(path)
+        if target.exists():
+            if not _is_event_store(target):
+                raise ValueError(f"{target} exists and is not an event store; not replacing it")
+            target.unlink()
+        return cls(target)
 
     @property
     def state(self) -> SimState:

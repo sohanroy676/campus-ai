@@ -71,6 +71,11 @@
       "id": "cs3",
       "size": 25,
       "step_free_required": false
+    },
+    {
+      "id": "cs4",
+      "size": 22,
+      "step_free_required": false
     }
   ],
   "faculty": [
@@ -79,9 +84,26 @@
     },
     {
       "id": "iyer"
+    },
+    {
+      "id": "menon"
     }
   ],
   "activities": [
+    {
+      "id": "ds-lab",
+      "cohort_id": "cs4",
+      "faculty_ids": [
+        "menon"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "AI-Lab-01",
+      "start_min": 1920
+    },
     {
       "id": "ml-lab",
       "cohort_id": "cs3",
