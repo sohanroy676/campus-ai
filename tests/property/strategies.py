@@ -137,6 +137,9 @@ def problems(draw: st.DrawFn, *, all_movable: bool = False) -> RecoveryProblem:
         window=WINDOW,
         plan_time_min=at(TUE, 7) + 5 * draw(st.integers(0, 24)),
         staff_available=draw(st.integers(1, 2)),
+        prior_moves_this_week=draw(
+            st.dictionaries(st.sampled_from([c.id for c in cohorts]), st.integers(0, 2), max_size=2)
+        ),
     )
 
 
