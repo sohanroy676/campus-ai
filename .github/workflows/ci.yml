@@ -1,0 +1,83 @@
+# CI pipeline. Runs on every push and PR to main, and manually via workflow_dispatch.
+# Mirrors the commands in AGENTS.md / CLAUDE.md: uv sync, ruff check, ruff format --check, mypy, pytest.
+#
+# The repo is still planning docs only. The Python jobs skip themselves until pyproject.toml exists,
+# so CI stays green now and starts enforcing as soon as code lands. The secret scan always runs.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect Python project
+        id: detect
+        run: |
+          if [ -f pyproject.toml ]; then
+            echo "python=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "python=false" >> "$GITHUB_OUTPUT"
+            echo "No pyproject.toml yet; skipping Python checks."
+          fi
+
+      - name: Install uv
+        if: steps.detect.outputs.python == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        if: steps.detect.outputs.python == 'true'
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        if: steps.detect.outputs.python == 'true'
+        run: uv sync --frozen
+
+      - name: Lint
+        if: steps.detect.outputs.python == 'true'
+        run: uv run ruff check .
+
+      - name: Format check
+        if: steps.detect.outputs.python == 'true'
+        run: uv run ruff format --check .
+
+      - name: Type check
+        if: steps.detect.outputs.python == 'true'
+        run: uv run mypy src
+
+      - name: Tests
+        if: steps.detect.outputs.python == 'true'
+        run: uv run pytest --durations=15
+
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for the gitleaks scan
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
