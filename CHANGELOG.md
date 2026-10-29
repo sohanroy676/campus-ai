@@ -17,6 +17,8 @@ Format follows Keep a Changelog. Generated from Conventional Commits — regener
 - Add scenario file loader and demo scenario
 - Add greedy recovery baseline
 - Run one scenario end to end with joint or greedy
+- Derive recovery window and movable classes
+- Derive window and movable ids when a scenario omits them
 
 ### Changed
 - Share stage K move cost with greedy
@@ -29,6 +31,8 @@ Format follows Keep a Changelog. Generated from Conventional Commits — regener
 - Extend R4 in the spec and refresh memory-bank
 - Record solver status and open spec questions
 - Correct memory-bank after solver-stages merge
+- Record Gate 1 and refresh memory-bank and changelog
+- Record the sim-and-greedy merge in memory-bank
 
 ### Maintenance
 - Add project docs, agent rules and CI config

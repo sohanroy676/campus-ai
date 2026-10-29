@@ -30,7 +30,7 @@
   - 279 tests; brute-force property test shows the solver's result equals the best valid plan; mutation probes catch dropped constraints. `rules/` and `solver/` coverage about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src`, `uv run pytest` all pass
 
-- Gate 1: one scenario runs end to end, baseline included, on `feature/sim-and-greedy` (6 feature commits, not pushed) — 2026-10-29
+- Gate 1: one scenario runs end to end, baseline included, on `feature/sim-and-greedy` (merged as PR #4, `main` = bafcbe8; CI green: `checks` and `secrets`) — 2026-10-29
   - Objective: stage S (start shift, minutes from the original start, both directions) between K and T, so the order is C, P, D, K, S, T and the budget is 10/10/3/3/2/2 s. Resolves assumption 19 (20 unchanged); spec section 4, ADR 0002 updated
   - `sim/`: SQLite event store (`store.py`) with append-only triggers, dense versions from 0, stale `PlanApplied` rejected, clock never backwards; pure reducer and `SimState` (`state.py`); ADR 0003. `EventStore.create_fresh` replaces only an earlier event store
   - `generator/scenario.py`: scenario = serialized `RecoveryProblem` (canonical JSON, `ScenarioError` naming the field); `scenarios/dev/ac-failure.json` is the demo
@@ -39,12 +39,17 @@
   - Demo result (golden test): joint scores people moved 26, greedy 55 (greedy puts `ml-lab` at 10:00 in AI-Lab-02 and then has to move `net-lab`)
   - 388 tests; coverage 99% overall, 100% for `sim/`, `baselines/`, `coordinator/`, `reporting/`, `generator/`. `ruff`, `mypy src`, `uv run pytest` pass
 
+- `impact/` on `feature/impact-and-generator` (merged as PR #5; CI green: `checks` and `secrets`) — 2026-10-29
+  - `impact/derive.py`: `assess()` and `derive_recovery()` give the window (plan time or first affected day start, to the end of the last affected day), the affected classes (overlap a clipped fault or hold; equipment holds hit classes needing that type in the pool's room) and the movable set (affected plus not-yet-started classes in the window within 10 minutes' walk). Faults and holds are clipped to plan time. Spec assumptions 21 to 24
+  - Scenario files may omit both `window` and `movable_activity_ids` (one without the other is an error); the demo gives the same scores either way
+  - 420 tests, coverage 99% overall and 100% for `impact/`; property tests: derivation is idempotent, no fixed class is left inside a disruption, and a sound timetable stays solvable after any disruption
+
 ## In progress
 
-- `feature/sim-and-greedy` awaits review. Push, PR and CI only with approval.
+- Nothing in progress. Next: the seeded generator on a new branch (ask the user for inputs first).
 
 ## Next
 
 - Confirm the other spec assumptions in `docs/model-spec.md` section 7.
 - Remaining ROADMAP "Now" item: officer and facilities interviews.
-- v0.3 to v0.5 (ROADMAP "Next"): `impact/` (fault to window and affected classes), seeded generator, repair-overrun re-planning loop, approval triggers, sequential and re-solve baselines.
+- v0.3 to v0.5 (ROADMAP "Next"): seeded generator (synthetic first, ITC 2019 loader when the data files exist), repair-overrun re-planning loop (re-run `derive_recovery` on the state), approval triggers, sequential and re-solve baselines.

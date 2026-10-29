@@ -1,6 +1,7 @@
-"""Scenario files: a `RecoveryProblem` serialized as JSON, with window and movable ids explicit.
+"""Scenario files: a `RecoveryProblem` serialized as JSON.
 
-`impact/` will derive the window and movable set from events later; until then the file states them.
+A file either states `window` and `movable_activity_ids` or leaves out both, in which case
+`impact/` derives them (and clips the faults and holds to plan time) from the disruptions.
 """
 
 import json
@@ -10,8 +11,12 @@ from typing import Any
 from pydantic import ValidationError
 
 from smartcampus.domain.problem import RecoveryProblem
+from smartcampus.impact.derive import derive_recovery
 
 MAX_SCENARIO_BYTES = 5_000_000  # a hand-made or generated scenario is far smaller
+
+_DERIVED_KEYS = frozenset({"window", "movable_activity_ids"})
+_DRAFT_FIELDS: dict[str, Any] = {"window": {"start": 0, "end": 1}, "movable_activity_ids": []}
 
 # Set-valued fields are written sorted, so the same problem always gives the same file.
 _SET_FIELDS = frozenset({"allowed_room_types", "movable_activity_ids"})
@@ -34,6 +39,18 @@ def load_scenario(path: Path) -> RecoveryProblem:
     except UnicodeDecodeError as error:
         raise ScenarioError(f"{path}: not UTF-8 text") from error
     try:
+        raw: Any = json.loads(text)
+    except json.JSONDecodeError:
+        raw = None  # the validation error below describes it
+    derive = isinstance(raw, dict) and _DERIVED_KEYS.isdisjoint(raw)
+    if isinstance(raw, dict) and not derive and not raw.keys() >= _DERIVED_KEYS:
+        raise ScenarioError(
+            f"{path}: give both window and movable_activity_ids, or neither "
+            "(then they are derived from the faults and holds)"
+        )
+    try:
+        if derive:
+            return derive_recovery(RecoveryProblem.model_validate({**raw, **_DRAFT_FIELDS}))
         return RecoveryProblem.model_validate_json(text)
     except ValidationError as error:
         raise ScenarioError(f"{path}: not a valid scenario\n{_summary(error)}") from error

@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/sim-and-greedy` is finished locally (6 feature commits, not pushed) and waits for review: stage S tie-break, `sim/` event store, scenario loader, greedy baseline and CLI `run` (Gate 1 reached). `main` = `origin/main` = 18b6c4b, CI green.
+`feature/impact-and-generator` is merged (PR #5; `impact/` only, CI green: `checks` and `secrets`). `main` = `origin/main`, nothing pending. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -25,7 +25,7 @@
 
 ## Blockers / open questions
 - Assumptions in `docs/model-spec.md` section 7 (1 to 20) still need the user's confirmation, except 3 (resolved by extending R4) and 19 (resolved: new stage S, distance from the original start, between K and T; 20 stays as is). A stage placed after T would not have fixed 19, because T already prefers the lower room index.
-- `impact/` is still missing: the scenario file states `window` and `movable_activity_ids` itself. Approval triggers (spec section 6) are not built: `run` applies the plan directly.
+- Decisions for `impact/`: window = plan time (or first affected day start) to the end of the last affected day; affected = overlap a fault or hold; movable = affected plus not-yet-started classes in the window within 10 minutes' walk; faults and holds are clipped to plan time (assumptions 21 to 24, still to confirm). Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Review `feature/sim-and-greedy`, then push and open a PR only with approval and watch CI with Monitor (include the secrets job). After that: `impact/`, the seeded generator, the repair-overrun loop and the other baselines (ROADMAP "Next").
+Start the seeded generator on a new branch (e.g. `feature/generator`): synthetic first, ITC 2019 loader later when the data files exist. Ask the user for its inputs before writing anything (campus size, load, severity, how many scenarios, what the frozen set holds, the generator version in run records). Then: sequential and re-solve baselines, eval harness and stats, Gate 2, the recovery loop with approval triggers, contract-net. Push and PR only with approval; watch CI with Monitor (include the secrets job).

@@ -6,7 +6,7 @@
 
 ## Next (weeks 5–10: v0.3 to v0.5)
 - Joint room + equipment + timing model and a seeded ITC 2019 generator.
-- Repair-overrun and second-event re-planning loop (the events and stale-plan rejection exist in `sim/`), `impact/` and approval triggers.
+- Repair-overrun and second-event re-planning loop (the events and stale-plan rejection exist in `sim/`, and `impact/` derives the window and movable set) and approval triggers.
 - Sequential and re-solve baselines, a contract-net variant and the evaluation harness.
 - Gate 2: all comparators run on 100+ scenarios. If not, the stretch goals are dropped.
 - Results view through FastAPI and a simple React page.
