@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from pydantic import BaseModel
+
 from smartcampus.domain.entities import (
     Activity,
     Building,
@@ -12,8 +14,46 @@ from smartcampus.domain.entities import (
     Room,
     Walk,
 )
+from smartcampus.domain.plan import Assignment, EquipmentMove, Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.domain.time import MINUTES_PER_DAY, Interval
+from smartcampus.rules.base import RuleId, Violation
+
+
+def evolve[M: BaseModel](model: M, **changes: Any) -> M:
+    """Rebuild a frozen model with some fields replaced, re-running validation."""
+    return type(model)(**{**dict(model), **changes})
+
+
+def asg(activity_id: str, room_id: str, start_min: int) -> Assignment:
+    return Assignment(activity_id=activity_id, room_id=room_id, start_min=start_min)
+
+
+def move(pool_id: str, activity_id: str, units: int, start_min: int, minutes: int) -> EquipmentMove:
+    return EquipmentMove(
+        pool_id=pool_id,
+        activity_id=activity_id,
+        units=units,
+        start_min=start_min,
+        end_min=start_min + minutes,
+    )
+
+
+def make_plan(
+    *assignments: Assignment,
+    cancelled: tuple[str, ...] = (),
+    moves: tuple[EquipmentMove, ...] = (),
+) -> Plan:
+    return Plan(
+        based_on_version=0,
+        assignments=assignments,
+        cancelled=frozenset(cancelled),
+        moves=moves,
+    )
+
+
+def rule_ids(violations: list[Violation]) -> list[RuleId]:
+    return [v.rule for v in violations]
 
 
 def at(day: int, hour: int, minute: int = 0) -> int:

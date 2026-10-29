@@ -37,6 +37,7 @@ CLAUDE.local.md
 .ruff_cache/
 .pytest_cache/
 .hypothesis/
+.coverage
 
 # Project data
 data/itc2019/

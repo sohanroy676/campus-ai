@@ -1,0 +1,52 @@
+"""R1 assignment: every affected activity gets exactly one (room, start_slot), or is cancelled."""
+
+from collections import Counter
+
+from smartcampus.domain.plan import Plan
+from smartcampus.domain.problem import RecoveryProblem
+from smartcampus.rules._shared import valid_starts
+from smartcampus.rules.base import RuleId, Violation
+
+
+def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
+    out: list[Violation] = []
+    movable = problem.movable_activity_ids
+    counts = Counter(asg.activity_id for asg in plan.assignments)
+    for activity_id in sorted(movable):
+        placed, cancelled = counts[activity_id], activity_id in plan.cancelled
+        if placed + cancelled == 1:
+            continue
+        if placed == 0:
+            reason = "is neither assigned nor cancelled"
+        elif cancelled:
+            reason = "is both assigned and cancelled"
+        else:
+            reason = f"is assigned {placed} times"
+        out.append(Violation(RuleId.R1, f"activity {activity_id} {reason}", (activity_id,)))
+    for activity_id in sorted((set(counts) | plan.cancelled) - movable):
+        out.append(
+            Violation(
+                RuleId.R1, f"activity {activity_id} is not an affected activity", (activity_id,)
+            )
+        )
+    rooms = {r.id for r in problem.campus.rooms}
+    for asg in plan.assignments:
+        if asg.activity_id not in movable:
+            continue
+        if asg.room_id not in rooms:
+            out.append(
+                Violation(
+                    RuleId.R1, f"unknown room {asg.room_id}", (asg.activity_id,), (asg.room_id,)
+                )
+            )
+        elif asg.start_min not in valid_starts(problem, problem.activity(asg.activity_id)):
+            out.append(
+                Violation(
+                    RuleId.R1,
+                    f"activity {asg.activity_id} cannot start at minute {asg.start_min}: "
+                    "not a slot inside the recovery window and a teaching day",
+                    (asg.activity_id,),
+                    (asg.room_id,),
+                )
+            )
+    return out
