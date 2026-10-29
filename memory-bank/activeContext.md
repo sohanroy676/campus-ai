@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/sim-and-greedy` is finished locally (6 feature commits, not pushed) and waits for review: stage S tie-break, `sim/` event store, scenario loader, greedy baseline and CLI `run` (Gate 1 reached). `main` = `origin/main` = 18b6c4b, CI green.
+`feature/sim-and-greedy` is merged (PR #4, `main` = `origin/main` = bafcbe8, CI green: `checks` and `secrets`): stage S tie-break, `sim/` event store, scenario loader, greedy baseline and CLI `run` (Gate 1 reached). Merged feature branches still exist; do not delete them.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -28,4 +28,4 @@
 - `impact/` is still missing: the scenario file states `window` and `movable_activity_ids` itself. Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Review `feature/sim-and-greedy`, then push and open a PR only with approval and watch CI with Monitor (include the secrets job). After that: `impact/`, the seeded generator, the repair-overrun loop and the other baselines (ROADMAP "Next").
+Next feature (`feature/impact-and-generator`): ask the user for the unknowns first (fault to window and affected classes, generator inputs), then `impact/` and the seeded generator. After that: the repair-overrun loop and the other baselines (ROADMAP "Next"). Push and PR only with approval; watch CI with Monitor.

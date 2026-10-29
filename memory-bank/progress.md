@@ -30,7 +30,7 @@
   - 279 tests; brute-force property test shows the solver's result equals the best valid plan; mutation probes catch dropped constraints. `rules/` and `solver/` coverage about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src`, `uv run pytest` all pass
 
-- Gate 1: one scenario runs end to end, baseline included, on `feature/sim-and-greedy` (6 feature commits, not pushed) — 2026-10-29
+- Gate 1: one scenario runs end to end, baseline included, on `feature/sim-and-greedy` (merged as PR #4, `main` = bafcbe8; CI green: `checks` and `secrets`) — 2026-10-29
   - Objective: stage S (start shift, minutes from the original start, both directions) between K and T, so the order is C, P, D, K, S, T and the budget is 10/10/3/3/2/2 s. Resolves assumption 19 (20 unchanged); spec section 4, ADR 0002 updated
   - `sim/`: SQLite event store (`store.py`) with append-only triggers, dense versions from 0, stale `PlanApplied` rejected, clock never backwards; pure reducer and `SimState` (`state.py`); ADR 0003. `EventStore.create_fresh` replaces only an earlier event store
   - `generator/scenario.py`: scenario = serialized `RecoveryProblem` (canonical JSON, `ScenarioError` naming the field); `scenarios/dev/ac-failure.json` is the demo
@@ -41,7 +41,7 @@
 
 ## In progress
 
-- `feature/sim-and-greedy` awaits review. Push, PR and CI only with approval.
+- `feature/impact-and-generator`: just started (open questions first). Push, PR and CI only with approval.
 
 ## Next
 
