@@ -325,3 +325,18 @@ def borrowing_plans(draw: st.DrawFn, problem: RecoveryProblem) -> Plan:
             moves.append(move(pool.id, activity.id, take, placed.start_min - length - lead, length))
             missing -= take
     return evolve(plan, moves=tuple(moves))
+
+
+@st.composite
+def tiny_problems(draw: st.DrawFn) -> RecoveryProblem:
+    """At most two affected classes, no equipment, a two-hour window: small enough to enumerate."""
+    base = draw(problems(all_movable=True))
+    activities = tuple(evolve(a, required_equipment={}) for a in base.activities[:2])
+    return evolve(
+        base,
+        campus=evolve(base.campus, pools=()),
+        activities=activities,
+        movable_activity_ids=frozenset(a.id for a in activities),
+        holds=tuple(h for h in base.holds if h.target_kind == "room"),
+        window=Interval(start=DAY_OPEN, end=at(TUE, 10)),
+    )
