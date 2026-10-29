@@ -19,7 +19,7 @@ from smartcampus.solver.solve import (
     solve,
 )
 
-FAST = SolverSettings(stage_seconds=(5, 5, 5, 5, 5))
+FAST = SolverSettings(stage_seconds=(5, 5, 5, 5, 5, 5))
 TUE_10 = at(1, 10)
 WHOLE_DAY = Interval(start=at(1, 8), end=at(1, 18))
 
@@ -34,16 +34,14 @@ def placement(result_plan_assignments: object, activity_id: str) -> tuple[str, i
 
 
 def assert_moved_to(result: SolveResult, room: str, original_start: int = TUE_10) -> None:
-    """Room is fixed by the objective; among equal-cost starts (D = 0) the spec picks none."""
-    placed_room, start = placement(result.plan.assignments, "act1")
-    assert placed_room == room
-    assert start <= original_start
+    """Room is fixed by the objective; the start-shift stage keeps the original start."""
+    assert placement(result.plan.assignments, "act1") == (room, original_start)
 
 
 def test_nothing_disrupted_keeps_every_class_where_it_was() -> None:
     result = solve(make_problem(), FAST)
     assert placement(result.plan.assignments, "act1") == ("A1", TUE_10)
-    assert result.values == StageValues(0, 0, 0, 0, 0)
+    assert result.values == StageValues(0, 0, 0, 0, 0, 0)
     assert [s.name for s in result.stages] == list(STAGE_NAMES)
     assert all(s.status is StageStatus.OPTIMAL for s in result.stages)
     assert validate(make_problem(), result.plan) == []
@@ -54,12 +52,10 @@ def test_a_fault_moves_the_class_at_the_lowest_stage_cost() -> None:
         make_problem(), faults=closed("A1", interval=Interval(start=TUE_10, end=at(1, 12)))
     )
     result = solve(problem, FAST)
-    # Every way to avoid the fault is one change (26 people) with no delay. Only the tie-break
-    # separates them, and it prefers the lowest room index: A1 earlier in the day, finishing
-    # by the time the fault starts, beats A2 at the original time.
-    room, start = placement(result.plan.assignments, "act1")
-    assert (room, start + 60 <= TUE_10) == ("A1", True)
-    assert result.values == StageValues(0, 26, 0, 0, 0)
+    # Every way to avoid the fault is one change (26 people) with no delay. The start-shift stage
+    # comes before the room tie-break, so A2 at the original time beats A1 an hour earlier.
+    assert_moved_to(result, "A2")
+    assert result.values == StageValues(0, 26, 0, 0, 0, 1)
 
 
 def test_when_the_whole_morning_is_lost_the_class_changes_room_instead() -> None:
@@ -68,7 +64,7 @@ def test_when_the_whole_morning_is_lost_the_class_changes_room_instead() -> None
     result = solve(problem, FAST)
     # A1 reopens at 12:00 (delay 120); A2 is free now (no delay) and in the same building.
     assert_moved_to(result, "A2")
-    assert result.values == StageValues(0, 26, 0, 0, 1)
+    assert result.values == StageValues(0, 26, 0, 0, 0, 1)
 
 
 def test_avoiding_a_cancellation_beats_any_amount_of_disruption() -> None:
@@ -91,7 +87,7 @@ def test_a_class_that_fits_nowhere_is_cancelled() -> None:
     result = solve(problem, FAST)
     assert result.plan.cancelled == frozenset({"act1"})
     assert result.plan.assignments == ()
-    assert result.values == StageValues(1, 0, 0, 0, 0)
+    assert result.values == StageValues(1, 0, 0, 0, 0, 0)
 
 
 def test_another_building_is_used_only_when_nothing_else_fits() -> None:
@@ -102,7 +98,7 @@ def test_another_building_is_used_only_when_nothing_else_fits() -> None:
     )
     result = solve(problem, FAST)
     assert_moved_to(result, "B1")
-    assert result.values == StageValues(0, 36, 0, 0, 1002)  # 1000 for the building + rank 2
+    assert result.values == StageValues(0, 36, 0, 0, 0, 1002)  # 1000 for the building + rank 2
 
 
 def test_delay_is_chosen_over_a_cancellation_when_the_room_reopens() -> None:
@@ -138,6 +134,7 @@ def test_stage_values_are_the_real_score_of_the_plan() -> None:
             result.values.people_moved,
             result.values.delay,
             result.values.cost,
+            result.values.start_shift,
             result.values.tie_break,
         )
     )
@@ -153,12 +150,12 @@ def test_nothing_to_recover_gives_an_empty_plan() -> None:
     problem = evolve(make_problem(), movable_activity_ids=frozenset())
     result = solve(problem, FAST)
     assert result.plan.assignments == () and result.plan.cancelled == frozenset()
-    assert result.values == StageValues(0, 0, 0, 0, 0)
+    assert result.values == StageValues(0, 0, 0, 0, 0, 0)
 
 
 def test_a_short_time_limit_still_returns_a_valid_plan() -> None:
     problem = evolve(make_problem(), faults=closed("A1"))
-    result = solve(problem, SolverSettings(stage_seconds=(0.5,) * 5))
+    result = solve(problem, SolverSettings(stage_seconds=(0.5,) * 6))
     assert validate(problem, result.plan) == []
 
 
@@ -214,9 +211,9 @@ def test_a_later_stage_that_times_out_keeps_the_plan_so_far(
 ) -> None:
     problem = evolve(make_problem(), faults=closed("A1"))
     expected = solve(problem, FAST)
-    fake_status(monkeypatch, statuses_after_first=2)  # C and P solved; D, K, T "time out"
+    fake_status(monkeypatch, statuses_after_first=2)  # C and P solved; D, K, S, T "time out"
     result = solve(problem, FAST)
-    assert [s.status for s in result.stages[2:]] == [StageStatus.TIME_LIMIT] * 3
+    assert [s.status for s in result.stages[2:]] == [StageStatus.TIME_LIMIT] * 4
     assert validate(problem, result.plan) == []
     assert result.values.cancellations == expected.values.cancellations
     assert result.values.people_moved == expected.values.people_moved

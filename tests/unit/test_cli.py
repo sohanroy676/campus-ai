@@ -20,7 +20,7 @@ def test_help_lists_all_commands() -> None:
 
 @pytest.mark.parametrize(
     "args",
-    [["generate"], ["run", "x.json"], ["compare", "x.json"], ["eval", "scenarios/frozen/"]],
+    [["generate"], ["compare", "x.json"], ["eval", "scenarios/frozen/"]],
 )
 def test_stub_commands_fail_loudly(args: list[str]) -> None:
     result = runner.invoke(app, args)

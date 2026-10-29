@@ -12,6 +12,14 @@ Format follows Keep a Changelog. Generated from Conventional Commits — regener
 - Add source-side equipment contention to R4
 - Add lexicographic objective stages and scorer
 - Add lexicographic solve and infeasibility explanation
+- Add start-shift stage between K and T
+- Add append-only event store and state projection
+- Add scenario file loader and demo scenario
+- Add greedy recovery baseline
+- Run one scenario end to end with joint or greedy
+
+### Changed
+- Share stage K move cost with greedy
 
 ### Documentation
 - Record scaffold status and add changelog config
@@ -19,6 +27,8 @@ Format follows Keep a Changelog. Generated from Conventional Commits — regener
 - Add model spec and ADR 0002
 - Update progress, roadmap and changelog
 - Extend R4 in the spec and refresh memory-bank
+- Record solver status and open spec questions
+- Correct memory-bank after solver-stages merge
 
 ### Maintenance
 - Add project docs, agent rules and CI config

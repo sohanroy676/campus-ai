@@ -1,0 +1,72 @@
+"""Scenario files: a `RecoveryProblem` serialized as JSON, with window and movable ids explicit.
+
+`impact/` will derive the window and movable set from events later; until then the file states them.
+"""
+
+import json
+from pathlib import Path
+from typing import Any
+
+from pydantic import ValidationError
+
+from smartcampus.domain.problem import RecoveryProblem
+
+MAX_SCENARIO_BYTES = 5_000_000  # a hand-made or generated scenario is far smaller
+
+# Set-valued fields are written sorted, so the same problem always gives the same file.
+_SET_FIELDS = frozenset({"allowed_room_types", "movable_activity_ids"})
+
+
+class ScenarioError(Exception):
+    """The scenario file cannot be read or does not describe a valid problem."""
+
+
+def load_scenario(path: Path) -> RecoveryProblem:
+    try:
+        size = path.stat().st_size
+        if size > MAX_SCENARIO_BYTES:
+            raise ScenarioError(
+                f"{path}: file is {size} bytes, over the {MAX_SCENARIO_BYTES} limit"
+            )
+        text = path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise ScenarioError(f"{path}: cannot read file ({error.strerror or error})") from error
+    except UnicodeDecodeError as error:
+        raise ScenarioError(f"{path}: not UTF-8 text") from error
+    try:
+        return RecoveryProblem.model_validate_json(text)
+    except ValidationError as error:
+        raise ScenarioError(f"{path}: not a valid scenario\n{_summary(error)}") from error
+
+
+def dump_scenario(problem: RecoveryProblem) -> str:
+    """Canonical JSON text: two-space indent, sorted set fields, LF, trailing newline."""
+    data = _sort_sets(problem.model_dump(mode="json"))
+    return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
+
+
+def save_scenario(problem: RecoveryProblem, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(dump_scenario(problem), encoding="utf-8", newline="\n")
+
+
+def _sort_sets(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: sorted(item) if key in _SET_FIELDS else _sort_sets(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_sort_sets(item) for item in value]
+    return value
+
+
+def _summary(error: ValidationError, limit: int = 5) -> str:
+    """The first few problems, each with the path to the bad field."""
+    lines = [
+        f"  {'.'.join(str(part) for part in problem['loc']) or '<file>'}: {problem['msg']}"
+        for problem in error.errors()[:limit]
+    ]
+    if error.error_count() > limit:
+        lines.append(f"  ... and {error.error_count() - limit} more")
+    return "\n".join(lines)

@@ -23,19 +23,28 @@
   - 219 tests: unit, Hypothesis properties, and check/encoding agreement tests (validator verdict equals CP-SAT feasibility). `rules/` coverage is about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src` and `uv run pytest` all pass
 
-- R4 source contention and the lexicographic solver on `feature/solver-stages` (5 commits, not pushed) — 2026-10-29
+- R4 source contention and the lexicographic solver on `feature/solver-stages` (merged and pushed, `main` = `origin/main` = 18b6c4b; CI green: `checks` and `secrets`) — 2026-10-29
   - R4: a moved unit is unavailable at its source until the borrowing class ends plus the return trip (same time as outbound; availability only, no mover, no K cost); per (room, type) stock check, check and CP-SAT encoding in agreement
-  - `solver/objective.py`: `StageValues` (C, P, D, K, T), `evaluate()` reference score, `stage_expressions()`
+  - `solver/objective.py`: `StageValues` (C, P, D, K, S, T), `evaluate()` reference score, `stage_expressions()`
   - `solver/solve.py`: `solve()` runs the five stages (10/10/4/4/2 s, workers 1, seed 42), validates the plan; `solver/explain.py` names conflicting rules for bad input
   - 279 tests; brute-force property test shows the solver's result equals the best valid plan; mutation probes catch dropped constraints. `rules/` and `solver/` coverage about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src`, `uv run pytest` all pass
 
+- Gate 1: one scenario runs end to end, baseline included, on `feature/sim-and-greedy` (6 feature commits, not pushed) — 2026-10-29
+  - Objective: stage S (start shift, minutes from the original start, both directions) between K and T, so the order is C, P, D, K, S, T and the budget is 10/10/3/3/2/2 s. Resolves assumption 19 (20 unchanged); spec section 4, ADR 0002 updated
+  - `sim/`: SQLite event store (`store.py`) with append-only triggers, dense versions from 0, stale `PlanApplied` rejected, clock never backwards; pure reducer and `SimState` (`state.py`); ADR 0003. `EventStore.create_fresh` replaces only an earlier event store
+  - `generator/scenario.py`: scenario = serialized `RecoveryProblem` (canonical JSON, `ScenarioError` naming the field); `scenarios/dev/ac-failure.json` is the demo
+  - `baselines/greedy.py`: classes by original start, each takes the cheapest valid placement by P, D, K, S, T (shared cost functions, `move_cost`), cancels if none fits
+  - `coordinator/run.py`, `reporting/summary.py`, CLI `smartcampus run <scenario> --method joint|greedy [--report] [--db]`; exit codes 0 ok, 1 no plan, 2 bad input, 3 internal
+  - Demo result (golden test): joint scores people moved 26, greedy 55 (greedy puts `ml-lab` at 10:00 in AI-Lab-02 and then has to move `net-lab`)
+  - 388 tests; coverage 99% overall, 100% for `sim/`, `baselines/`, `coordinator/`, `reporting/`, `generator/`. `ruff`, `mypy src`, `uv run pytest` pass
+
 ## In progress
 
-- `feature/solver-stages` awaits review. Push, PR and CI only with approval.
+- `feature/sim-and-greedy` awaits review. Push, PR and CI only with approval.
 
 ## Next
 
-- Decide spec assumption 19: equal-cost start times (the solver may pull classes earlier) and whether to add a tie-break for distance from the original start.
 - Confirm the other spec assumptions in `docs/model-spec.md` section 7.
-- Remaining ROADMAP "Now" items: officer and facilities interviews, event-log simulator, greedy baseline, CLI `run` end to end (needs a scenario loader).
+- Remaining ROADMAP "Now" item: officer and facilities interviews.
+- v0.3 to v0.5 (ROADMAP "Next"): `impact/` (fault to window and affected classes), seeded generator, repair-overrun re-planning loop, approval triggers, sequential and re-solve baselines.
