@@ -25,7 +25,7 @@
 
 - R4 source contention and the lexicographic solver on `feature/solver-stages` (merged and pushed, `main` = `origin/main` = 18b6c4b; CI green: `checks` and `secrets`) — 2026-10-29
   - R4: a moved unit is unavailable at its source until the borrowing class ends plus the return trip (same time as outbound; availability only, no mover, no K cost); per (room, type) stock check, check and CP-SAT encoding in agreement
-  - `solver/objective.py`: `StageValues` (C, P, D, K, T), `evaluate()` reference score, `stage_expressions()`
+  - `solver/objective.py`: `StageValues` (C, P, D, K, S, T), `evaluate()` reference score, `stage_expressions()`
   - `solver/solve.py`: `solve()` runs the five stages (10/10/4/4/2 s, workers 1, seed 42), validates the plan; `solver/explain.py` names conflicting rules for bad input
   - 279 tests; brute-force property test shows the solver's result equals the best valid plan; mutation probes catch dropped constraints. `rules/` and `solver/` coverage about 100%
   - Checked locally: `ruff check`, `ruff format --check`, `mypy src`, `uv run pytest` all pass

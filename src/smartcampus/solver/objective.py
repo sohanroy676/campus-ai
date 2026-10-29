@@ -1,4 +1,4 @@
-"""The lexicographic objective (docs/model-spec.md section 4): C, P, D, K, T.
+"""The lexicographic objective (docs/model-spec.md section 4): C, P, D, K, S, T.
 
 Per-placement costs are plain functions used twice: `evaluate` scores a finished plan, and
 `stage_expressions` turns the same costs into CP-SAT linear expressions over the decision variables.
@@ -29,6 +29,7 @@ class StageValues:
     people_moved: int
     delay: int
     cost: int
+    start_shift: int
     tie_break: int
 
 
@@ -59,6 +60,11 @@ def delay_minutes(activity: Activity, start: int) -> int:
     return max(0, start - activity.start_min)
 
 
+def shift_minutes(activity: Activity, start: int) -> int:
+    """Minutes between the new and the original start, in either direction."""
+    return abs(start - activity.start_min)
+
+
 def changes_building(problem: RecoveryProblem, activity: Activity, room_id: str) -> bool:
     campus = problem.campus
     return campus.room(room_id).building_id != campus.room(activity.room_id).building_id
@@ -86,13 +92,14 @@ def evaluate(problem: RecoveryProblem, plan: Plan) -> StageValues:
     placed = {p.activity.id: p for p in plan_placements(problem, plan)}
     affected = [a for a in problem.activities if a.id in problem.movable_activity_ids]
     cancellations = sum(a.id in plan.cancelled for a in affected)
-    people = delay = tie_break = 0
+    people = delay = start_shift = tie_break = 0
     changed_by_cohort: dict[str, int] = defaultdict(int)
     for activity in affected:
         if (p := placed.get(activity.id)) is None:
             continue
         people += people_cost(problem, activity, p.room.id, p.start)
         delay += delay_minutes(activity, p.start)
+        start_shift += shift_minutes(activity, p.start)
         tie_break += tie_break_cost(problem, activity, p.room.id, p.start)
         changed_by_cohort[activity.cohort_id] += is_changed(activity, p.room.id, p.start)
     people += REPEAT_MOVE_PENALTY * sum(
@@ -105,7 +112,7 @@ def evaluate(problem: RecoveryProblem, plan: Plan) -> StageValues:
             problem, pool, p.room.id
         ):
             cost += CROSS_BUILDING_MOVE_COST
-    return StageValues(cancellations, people, delay, cost, tie_break)
+    return StageValues(cancellations, people, delay, cost, start_shift, tie_break)
 
 
 def _weighted(terms: list[tuple[int, cp_model.IntVar]]) -> cp_model.LinearExprT:
@@ -113,12 +120,13 @@ def _weighted(terms: list[tuple[int, cp_model.IntVar]]) -> cp_model.LinearExprT:
 
 
 def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
-    """The five stage expressions, in solving order, over the decision variables of `ctx`."""
+    """The six stage expressions, in solving order, over the decision variables of `ctx`."""
     problem, model = ctx.problem, ctx.model
     affected = [a for a in problem.activities if a.id in problem.movable_activity_ids]
 
     people: list[tuple[int, cp_model.IntVar]] = []
     delay: list[tuple[int, cp_model.IntVar]] = []
+    start_shift: list[tuple[int, cp_model.IntVar]] = []
     tie_break: list[tuple[int, cp_model.IntVar]] = []
     changed_by_cohort: dict[str, list[cp_model.IntVar]] = defaultdict(list)
     for activity in affected:
@@ -128,6 +136,7 @@ def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
             room_id, start = option.room.id, option.start
             people.append((people_cost(problem, activity, room_id, start), option.var))
             delay.append((delay_minutes(activity, start), option.var))
+            start_shift.append((shift_minutes(activity, start), option.var))
             tie_break.append((tie_break_cost(problem, activity, room_id, start), option.var))
             if is_changed(activity, room_id, start):
                 changed_by_cohort[activity.cohort_id].append(option.var)
@@ -165,5 +174,6 @@ def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
         _weighted(people),
         _weighted(delay),
         _weighted(cost),
+        _weighted(start_shift),
         _weighted(tie_break),
     ]

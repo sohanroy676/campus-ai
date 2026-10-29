@@ -1,4 +1,4 @@
-"""Solve a recovery problem: one CP-SAT model, five lexicographic stages (C, P, D, K, T).
+"""Solve a recovery problem: one CP-SAT model, six lexicographic stages (C, P, D, K, S, T).
 
 After each stage its optimum is fixed as a constraint ("stage value <= optimum") before the next
 stage runs. A stage that hits its time limit keeps the best solution it found.
@@ -19,14 +19,14 @@ from smartcampus.rules.variables import DecisionVars, build_variables
 from smartcampus.solver.explain import explain_infeasibility
 from smartcampus.solver.objective import StageValues, evaluate, stage_expressions
 
-STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "tie_break")
+STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", "tie_break")
 
 
 @dataclass(frozen=True)
 class SolverSettings:
-    """Defaults from the spec: 30 s split 10 / 10 / 4 / 4 / 2, single worker, fixed seed."""
+    """Defaults from the spec: 30 s split 10 / 10 / 3 / 3 / 2 / 2, single worker, fixed seed."""
 
-    stage_seconds: tuple[float, float, float, float, float] = (10, 10, 4, 4, 2)
+    stage_seconds: tuple[float, float, float, float, float, float] = (10, 10, 3, 3, 2, 2)
     num_workers: int = 1
     random_seed: int = 42
 

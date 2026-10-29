@@ -23,18 +23,18 @@ def placed(room: str, start: int = TUE_10) -> Plan:
 
 
 def test_unchanged_plan_costs_nothing() -> None:
-    assert values(make_problem(), placed("A1")) == (0, 0, 0, 0, 0)
+    assert values(make_problem(), placed("A1")) == (0, 0, 0, 0, 0, 0)
 
 
 @pytest.mark.parametrize(
     ("room", "start", "expected"),
     [
-        ("A2", TUE_10, (0, 26, 0, 0, 1)),  # other room, same building: rank of A2 is 1
-        ("B1", TUE_10, (0, 26, 0, 0, 1002)),  # other building: 1000 + rank of B1 (2)
-        ("A1", at(1, 10, 30), (0, 26, 30, 0, 0)),  # 30 minutes later, same room rank 0
-        ("A1", at(1, 12), (0, 26, 120, 0, 0)),  # delay is counted in minutes
-        ("A1", at(1, 9, 30), (0, 26, 0, 0, 0)),  # earlier is a change but never a delay
-        ("B1", at(1, 11), (0, 26, 60, 0, 1002)),
+        ("A2", TUE_10, (0, 26, 0, 0, 0, 1)),  # other room, same building: rank of A2 is 1
+        ("B1", TUE_10, (0, 26, 0, 0, 0, 1002)),  # other building: 1000 + rank of B1 (2)
+        ("A1", at(1, 10, 30), (0, 26, 30, 0, 30, 0)),  # 30 minutes later, same room rank 0
+        ("A1", at(1, 12), (0, 26, 120, 0, 120, 0)),  # delay is counted in minutes
+        ("A1", at(1, 9, 30), (0, 26, 0, 0, 30, 0)),  # earlier: a start shift but never a delay
+        ("B1", at(1, 11), (0, 26, 60, 0, 60, 1002)),
     ],
 )
 def test_one_changed_class(room: str, start: int, expected: tuple[int, ...]) -> None:
@@ -42,7 +42,7 @@ def test_one_changed_class(room: str, start: int, expected: tuple[int, ...]) -> 
 
 
 def test_cancelling_counts_only_in_the_first_stage() -> None:
-    assert values(make_problem(), make_plan(cancelled=("act1",))) == (1, 0, 0, 0, 0)
+    assert values(make_problem(), make_plan(cancelled=("act1",))) == (1, 0, 0, 0, 0, 0)
 
 
 @pytest.mark.parametrize(
@@ -102,7 +102,7 @@ def test_unaffected_classes_contribute_nothing() -> None:
     problem = make_problem(
         activities=(make_activity(), make_activity(id="fixed", cohort_id="c2", room_id="B1")),
     )
-    assert values(problem, placed("A2")) == (0, 26, 0, 0, 1)
+    assert values(problem, placed("A2")) == (0, 26, 0, 0, 0, 1)
 
 
 def moved_plan(room: str, units: int = 2) -> Plan:
@@ -125,7 +125,7 @@ def test_equipment_cost(room: str, units: int, cost: int) -> None:
 
 def test_a_move_for_a_cancelled_class_still_costs_minutes() -> None:
     plan = make_plan(cancelled=("act1",), moves=(move("gpu", "act1", 2, at(1, 9), 25),))
-    assert values(make_problem(), plan) == (1, 0, 0, 25, 0)
+    assert values(make_problem(), plan) == (1, 0, 0, 25, 0, 0)
 
 
 def test_room_rank_uses_alphabetical_order_not_listing_order() -> None:
@@ -138,8 +138,9 @@ def test_room_rank_uses_alphabetical_order_not_listing_order() -> None:
 
 
 def test_stage_values_compare_lexicographically() -> None:
-    assert StageValues(0, 999, 999, 999, 999) < StageValues(1, 0, 0, 0, 0)
-    assert StageValues(1, 5, 0, 0, 0) < StageValues(1, 6, 0, 0, 0)
-    assert min([StageValues(2, 0, 0, 0, 0), StageValues(1, 9, 9, 9, 9)]) == StageValues(
-        1, 9, 9, 9, 9
+    assert StageValues(0, 999, 999, 999, 999, 999) < StageValues(1, 0, 0, 0, 0, 0)
+    assert StageValues(1, 5, 0, 0, 0, 0) < StageValues(1, 6, 0, 0, 0, 0)
+    assert StageValues(1, 5, 0, 0, 30, 1002) < StageValues(1, 5, 0, 0, 60, 0)  # S before T
+    assert min([StageValues(2, 0, 0, 0, 0, 0), StageValues(1, 9, 9, 9, 9, 9)]) == StageValues(
+        1, 9, 9, 9, 9, 9
     )

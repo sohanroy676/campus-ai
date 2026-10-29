@@ -40,10 +40,11 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
    - Add 50 for each cohort moved a second (or later) time in the same week.
 3. **D, delay**: total minutes (not slots) that activities start later than originally planned.
 4. **K, cost**: equipment staff-minutes, plus 20 per cross-building move. An energy term is added here later, only if the stretch goal passes.
-5. **T, tie-break**: `1000 x (number of activities moved to a different building)` plus the sum of new room indices. Room index is the position of the room id after sorting room ids alphabetically, which makes the choice deterministic.
+5. **S, start shift**: total minutes between each placed activity's new start and its original start, earlier or later. An unchanged activity adds 0.
+6. **T, tie-break**: `1000 x (number of activities moved to a different building)` plus the sum of new room indices. Room index is the position of the room id after sorting room ids alphabetically, which makes the choice deterministic.
 
 ## 5. Solver
-- 30 s total limit, spread across the stages as 10 / 10 / 4 / 4 / 2 s. Each stage keeps the best solution it found.
+- 30 s total limit, spread across the stages as 10 / 10 / 3 / 3 / 2 / 2 s. Each stage keeps the best solution it found.
 - `num_workers = 1` and `random_seed = 42` for tests, evaluation and the demo.
 - Infeasibility: the model can always cancel, so a real "no solution" means bad input and is an error. For rejected-option explanations, each rule R1 to R8 sits behind an assumption literal and the conflicting rules are reported.
 
@@ -69,5 +70,5 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 16. Stage P "changed" means placed in a different room or at a different start than originally; a cancelled activity counts in C only. The repeat-move surcharge is 50 x repeats per cohort, where repeats = `m` if `prior_moves_this_week >= 1`, else `max(0, m - 1)`, and `m` is the number of changed activities of that cohort. This matches assumption 6 and does not depend on activity order.
 17. Stage D counts only later starts, never negative. Stage T's room-index sum covers changed activities only; "moved to a different building" means placed in a building other than the original room's. Stage K's "cross-building move" is an equipment move whose source pool sits in a different building from the room it is moved to.
 18. Lateness factor is 2 when `original start - plan time < 30` minutes, including a class that has already started.
-19. **Open question for the user.** The objective does not prefer any start time among equal-cost options. A class changed in room or start costs the same in P, D counts only later starts, and T ranks rooms only. So moving a class one hour earlier in its own room costs the same as moving it to another room at the original time, and wins on T when its room index is lower. The solver is deterministic (workers 1, seed 42), but a timetabling officer may not want classes pulled earlier. A fix would be a tie-break term for the distance from the original start; I did not add one because it is not in your objective.
-20. When the units of a move are carried is not part of the objective. The solver returns any start that satisfies R4, R5 and R8, not the earliest or the latest.
+19. Resolved: stage S (start shift) sits between K and T. Among equal-cost options a class stays as close as possible to its original start, and T then picks the room. So "A2 at the original time" beats "A1 an hour earlier". S counts both directions, so it also pulls late starts back; D still counts only later starts and ranks first.
+20. Unchanged by 19: when the units of a move are carried is not part of the objective. The solver returns any start that satisfies R4, R5 and R8, not the earliest or the latest.

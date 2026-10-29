@@ -13,7 +13,7 @@ from smartcampus.rules.validator import validate
 from smartcampus.solver.objective import StageValues, evaluate
 from smartcampus.solver.solve import SolverSettings, solve
 
-QUICK = SolverSettings(stage_seconds=(5, 5, 5, 5, 5))
+QUICK = SolverSettings(stage_seconds=(5, 5, 5, 5, 5, 5))
 
 
 def best_by_brute_force(problem: RecoveryProblem) -> StageValues | None:
