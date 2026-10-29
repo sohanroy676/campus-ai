@@ -10,6 +10,16 @@ from smartcampus.domain.entities import Activity, Campus, Cohort, Faculty, Fault
 from smartcampus.domain.time import Interval
 
 
+class Provenance(FrozenModel):
+    """How a generated scenario was made; with the solver settings it repeats a run exactly."""
+
+    generator_version: str
+    seed: int
+    size: str
+    load: int
+    severity: str
+
+
 class RecoveryProblem(FrozenModel):
     campus: Campus
     cohorts: tuple[Cohort, ...]
@@ -22,6 +32,7 @@ class RecoveryProblem(FrozenModel):
     plan_time_min: int = Field(ge=0)
     staff_available: int = Field(default=2, ge=1)
     prior_moves_this_week: dict[str, int] = Field(default_factory=dict)
+    provenance: Provenance | None = None  # set by the generator; hand-made scenarios leave it out
 
     @model_validator(mode="after")
     def _check_references(self) -> Self:

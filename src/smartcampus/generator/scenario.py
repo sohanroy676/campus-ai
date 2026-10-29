@@ -58,7 +58,7 @@ def load_scenario(path: Path) -> RecoveryProblem:
 
 def dump_scenario(problem: RecoveryProblem) -> str:
     """Canonical JSON text: two-space indent, sorted set fields, LF, trailing newline."""
-    data = _sort_sets(problem.model_dump(mode="json"))
+    data = _sort_sets(problem.model_dump(mode="json", exclude_none=True))
     return json.dumps(data, indent=2, ensure_ascii=False) + "\n"
 
 

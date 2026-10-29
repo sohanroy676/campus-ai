@@ -76,3 +76,12 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 22. Recovery window: from plan time (or the start of the first affected teaching day, if later) to the end of the last affected teaching day. Days are the Monday to Friday days that a clipped fault or hold overlaps; weekend-only disruptions change nothing. With nothing left to recover the window is one idle slot after plan time and no class is movable.
 23. Affected classes (they must move or be cancelled): classes that overlap a clipped fault or room hold on their room, or an equipment hold on a pool in their room whose type they need. A class that is already running is affected and may only start later or be cancelled; that is why the lateness factor in assumption 18 covers started classes.
 24. Movable classes: the affected ones, plus classes that have not started, lie inside the window and sit in a building within 10 minutes' walk of a disrupted room (the same limit as R6). A scenario file may state `window` and `movable_activity_ids` itself, both or neither; if neither, `impact/` derives them.
+
+## 8. Synthetic generator
+`generator/synth.py`, `generate_scenario(size, load, severity, seed)`; the same arguments always give the same file (version `GENERATOR_VERSION`, now "1"; bump it when output for a given seed changes).
+- Sizes: small 2 buildings x 4 rooms, medium 3 x 7, large 5 x 8 (lecture and lab rooms alternate; GPU pools in some labs). Cohorts and faculty: two per room.
+- Load: percent of room-slots in the week used by the baseline timetable (10 to 95). Random placement, so the share lands at or just under the target at high loads.
+- Severity: `room` (one room fault), `building` (every room of one building), `hold` (a safety hold on the GPU pool of a class that needs it, else on the room). The disruption starts when a chosen class starts; plan time is two hours earlier. A repair overrun is an event, not scenario data, so it is not a severity.
+- The baseline obeys the rules (including R6 travel). A scenario is only returned if cancelling every movable class is a valid plan.
+- `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
+- Known limit: joint finds no plan within the 10 s first stage for medium at load 90, so do not freeze that combination.

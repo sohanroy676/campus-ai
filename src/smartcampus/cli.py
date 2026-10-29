@@ -6,7 +6,8 @@ from typing import Annotated
 import typer
 
 from smartcampus.coordinator.run import Method, run_scenario
-from smartcampus.generator.scenario import ScenarioError, load_scenario
+from smartcampus.generator.scenario import ScenarioError, load_scenario, save_scenario
+from smartcampus.generator.synth import GeneratorError, generate_scenario
 from smartcampus.reporting.summary import format_summary, write_report
 from smartcampus.rules.validator import PlanInvalidError
 from smartcampus.sim.state import InvalidEventError
@@ -24,13 +25,23 @@ def _not_implemented(command: str) -> None:
 @app.command()
 def generate(
     size: Annotated[str, typer.Option(help="Campus size: small, medium or large.")] = "small",
-    load: Annotated[int, typer.Option(help="Timetable load in percent.")] = 75,
-    severity: Annotated[str, typer.Option(help="Disruption severity, e.g. room.")] = "room",
+    load: Annotated[int, typer.Option(help="Timetable load in percent (10 to 95).")] = 75,
+    severity: Annotated[str, typer.Option(help="Disruption: room, building or hold.")] = "room",
     seed: Annotated[int, typer.Option(help="Random seed.")] = 1,
     out: Annotated[Path, typer.Option(help="Output directory.")] = Path("scenarios/"),
 ) -> None:
-    """Generate a seeded scenario file."""
-    _not_implemented("generate")
+    """Generate a seeded scenario file.
+
+    Exit codes: 0 written; 2 bad options.
+    """
+    try:
+        problem = generate_scenario(size, load, severity, seed)
+    except GeneratorError as error:
+        typer.echo(f"smartcampus generate: {error}", err=True)
+        raise typer.Exit(code=2) from error
+    path = out / f"{size}-l{load}-{severity}-s{seed}.json"
+    save_scenario(problem, path)
+    typer.echo(f"Scenario: {path} ({len(problem.activities)} classes)")
 
 
 @app.command()

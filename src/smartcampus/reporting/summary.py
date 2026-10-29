@@ -72,6 +72,9 @@ def report_dict(result: RunResult, scenario: Path) -> dict[str, Any]:
     return {
         "scenario": scenario.as_posix(),
         "method": result.method.value,
+        "provenance": None
+        if result.problem.provenance is None
+        else result.problem.provenance.model_dump(),
         "solver": None
         if settings is None
         else {
