@@ -25,7 +25,7 @@
 
 ## Blockers / open questions
 - Assumptions in `docs/model-spec.md` section 7 (1 to 20) still need the user's confirmation, except 3 (resolved by extending R4) and 19 (resolved: new stage S, distance from the original start, between K and T; 20 stays as is). A stage placed after T would not have fixed 19, because T already prefers the lower room index.
-- `impact/` is still missing: the scenario file states `window` and `movable_activity_ids` itself. Approval triggers (spec section 6) are not built: `run` applies the plan directly.
+- Decisions for `impact/`: window = plan time (or first affected day start) to the end of the last affected day; affected = overlap a fault or hold; movable = affected plus not-yet-started classes in the window within 10 minutes' walk; faults and holds are clipped to plan time (assumptions 21 to 24, still to confirm). Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Next feature (`feature/impact-and-generator`): ask the user for the unknowns first (fault to window and affected classes, generator inputs), then `impact/` and the seeded generator. After that: the repair-overrun loop and the other baselines (ROADMAP "Next"). Push and PR only with approval; watch CI with Monitor.
+Review `feature/impact-and-generator` (`impact/` only; the generator was left for its own branch by the user's choice), then push and PR only with approval and watch CI with Monitor (include the secrets job). After that: the seeded generator (synthetic; ITC 2019 later), the repair-overrun loop and the other baselines.
