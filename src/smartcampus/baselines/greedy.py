@@ -22,9 +22,9 @@ from smartcampus.rules._shared import (
 from smartcampus.rules.validator import validate
 from smartcampus.solver.explain import explain_infeasibility
 from smartcampus.solver.objective import (
-    CROSS_BUILDING_MOVE_COST,
     crosses_buildings,
     delay_minutes,
+    move_cost,
     people_cost,
     shift_minutes,
     tie_break_cost,
@@ -81,7 +81,10 @@ def _candidates(problem: RecoveryProblem, activity: Activity) -> list[Candidate]
             cost = (
                 people_cost(problem, activity, room.id, start),
                 delay_minutes(activity, start),
-                _move_cost(problem, new_moves, room),
+                sum(
+                    move_cost(problem, problem.campus.pool(m.pool_id), m.units, room.id)
+                    for m in new_moves
+                ),
                 shift_minutes(activity, start),
                 tie_break_cost(problem, activity, room.id, start),
             )
@@ -127,13 +130,3 @@ def _moves_for(
         if missing:
             return None
     return tuple(moves)
-
-
-def _move_cost(problem: RecoveryProblem, moves: tuple[EquipmentMove, ...], room: Room) -> int:
-    cost = 0
-    for move in moves:
-        pool = problem.campus.pool(move.pool_id)
-        cost += move_minutes(pool, move.units)
-        if crosses_buildings(problem, pool, room.id):
-            cost += CROSS_BUILDING_MOVE_COST
-    return cost

@@ -87,6 +87,19 @@ def crosses_buildings(problem: RecoveryProblem, pool: EquipmentPool, room_id: st
     return campus.room(pool.room_id).building_id != campus.room(room_id).building_id
 
 
+def move_cost(
+    problem: RecoveryProblem, pool: EquipmentPool, units: int, room_id: str | None
+) -> int:
+    """Stage K cost of one move: staff minutes, plus a surcharge if it lands in another building.
+
+    `room_id` is where the class ends up; None (the class is not placed) means no surcharge.
+    """
+    cost = move_minutes(pool, units)
+    if room_id is not None and crosses_buildings(problem, pool, room_id):
+        cost += CROSS_BUILDING_MOVE_COST
+    return cost
+
+
 def evaluate(problem: RecoveryProblem, plan: Plan) -> StageValues:
     """Stage values of a plan that passes the validator (one placement per affected class)."""
     placed = {p.activity.id: p for p in plan_placements(problem, plan)}
@@ -107,11 +120,8 @@ def evaluate(problem: RecoveryProblem, plan: Plan) -> StageValues:
     )
     cost = 0
     for m, pool, activity in known_moves(problem, plan):
-        cost += move_minutes(pool, m.units)
-        if (p := placed.get(activity.id)) is not None and crosses_buildings(
-            problem, pool, p.room.id
-        ):
-            cost += CROSS_BUILDING_MOVE_COST
+        p = placed.get(activity.id)
+        cost += move_cost(problem, pool, m.units, p.room.id if p is not None else None)
     return StageValues(cancellations, people, delay, cost, start_shift, tie_break)
 
 
