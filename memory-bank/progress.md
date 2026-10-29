@@ -44,9 +44,14 @@
   - Scenario files may omit both `window` and `movable_activity_ids` (one without the other is an error); the demo gives the same scores either way
   - 420 tests, coverage 99% overall and 100% for `impact/`; property tests: derivation is idempotent, no fixed class is left inside a disruption, and a sound timetable stays solvable after any disruption
 
+- Seeded synthetic generator on `feature/generator` (not pushed) — 2026-10-29
+  - `generator/synth.py`: `generate_scenario(size, load, severity, seed)`; sizes small/medium/large, load 10 to 95, severity room/building/hold; `provenance` (generator version, seed, parameters) in the scenario file and in the run report; CLI `smartcampus generate`
+  - Spec section 8. Checked: small (loads 50 to 90) and medium (50, 75) solve with both methods; medium at load 90 gives joint no plan within 10 s
+  - 451 tests, coverage 99%; frozen set not yet written (needs approval)
+
 ## In progress
 
-- Nothing in progress. Next: the seeded generator on a new branch (ask the user for inputs first).
+- `feature/generator` awaits review; frozen set in `scenarios/frozen/` still to be agreed.
 
 ## Next
 
