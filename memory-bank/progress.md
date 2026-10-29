@@ -39,14 +39,14 @@
   - Demo result (golden test): joint scores people moved 26, greedy 55 (greedy puts `ml-lab` at 10:00 in AI-Lab-02 and then has to move `net-lab`)
   - 388 tests; coverage 99% overall, 100% for `sim/`, `baselines/`, `coordinator/`, `reporting/`, `generator/`. `ruff`, `mypy src`, `uv run pytest` pass
 
-- `impact/` on `feature/impact-and-generator` (2 feature commits, not pushed) — 2026-10-29
+- `impact/` on `feature/impact-and-generator` (merged as PR #5; CI green: `checks` and `secrets`) — 2026-10-29
   - `impact/derive.py`: `assess()` and `derive_recovery()` give the window (plan time or first affected day start, to the end of the last affected day), the affected classes (overlap a clipped fault or hold; equipment holds hit classes needing that type in the pool's room) and the movable set (affected plus not-yet-started classes in the window within 10 minutes' walk). Faults and holds are clipped to plan time. Spec assumptions 21 to 24
   - Scenario files may omit both `window` and `movable_activity_ids` (one without the other is an error); the demo gives the same scores either way
   - 420 tests, coverage 99% overall and 100% for `impact/`; property tests: derivation is idempotent, no fixed class is left inside a disruption, and a sound timetable stays solvable after any disruption
 
 ## In progress
 
-- `feature/impact-and-generator` awaits review. Push, PR and CI only with approval.
+- Nothing in progress. Next: the seeded generator on a new branch (ask the user for inputs first).
 
 ## Next
 
