@@ -4,6 +4,7 @@ import time
 from dataclasses import dataclass
 from enum import StrEnum
 
+from smartcampus.agents.contract_net import contract_net
 from smartcampus.baselines.greedy import greedy
 from smartcampus.baselines.resolve import resolve_from_scratch, resolve_settings
 from smartcampus.baselines.sequential import sequential
@@ -21,6 +22,7 @@ class Method(StrEnum):
     GREEDY = "greedy"
     RESOLVE = "resolve"
     SEQUENTIAL = "sequential"
+    CONTRACT_NET = "contract_net"
 
 
 @dataclass(frozen=True)
@@ -83,6 +85,10 @@ def plan_with_method(
         used_settings = settings or SolverSettings.for_problem(current)
         solved = sequential(current, used_settings, based_on_version=version)
         plan, stages = solved.plan, solved.stages
+    elif method is Method.CONTRACT_NET:
+        used_settings = settings or SolverSettings.for_problem(current)
+        limit = sum(used_settings.stage_seconds)  # the tier's total, as for the solver methods
+        plan = contract_net(current, time_limit_seconds=limit, based_on_version=version)
     else:
         plan = greedy(current, based_on_version=version)
 

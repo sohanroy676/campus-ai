@@ -34,7 +34,7 @@ def _fmt(summary: Summary | None) -> str:
 
 def _methods(records: Sequence[RunRecord]) -> list[str]:
     seen = {r.method for r in records}
-    ordered = ["greedy", "sequential", "resolve", "joint"]
+    ordered = ["greedy", "contract_net", "sequential", "resolve", "joint"]
     return [m for m in ordered if m in seen] + sorted(seen - set(ordered))
 
 
