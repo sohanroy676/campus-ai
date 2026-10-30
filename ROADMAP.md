@@ -5,10 +5,10 @@
 - Gate 1 reached (2026-10-29): `smartcampus run scenarios/dev/ac-failure.json --method joint|greedy` runs end to end. The event log, greedy baseline and CP-SAT solver are done.
 
 ## Next (weeks 5–10: v0.3 to v0.5)
-- Seeded synthetic generator is done (`smartcampus generate`, spec section 8). Still to do: the frozen scenario set and an ITC 2019 loader (waits for the data files).
+- Seeded synthetic generator and the frozen 405-instance set are done (`smartcampus generate`, spec section 8). Still to do: an ITC 2019 loader (waits for the data files).
 - Repair-overrun and second-event re-planning loop (the events and stale-plan rejection exist in `sim/`, and `impact/` derives the window and movable set) and approval triggers.
-- Sequential and re-solve baselines, a contract-net variant and the evaluation harness.
-- Gate 2: all comparators run on the 405-instance frozen v1.0 evaluation set (20 smoke instances are separate and not counted). Progress: 270 of 405 frozen (135 small, 135 medium; large waits for a measured time tier). If not met, the stretch goals are dropped.
+- Sequential and re-solve baselines and the evaluation harness are done (spec sections 9 and 10). Still to do: a contract-net variant.
+- Gate 2: all comparators run on the 405-instance frozen v1.0 evaluation set (20 smoke instances are separate and not counted). Progress: all 405 frozen; the full run is deferred until every feature is built (ADR 0007). If not met, the stretch goals are dropped.
 - Results view through FastAPI and a simple React page.
 
 ## Later ideas (only if Gate 2 passes, or after v1.0)

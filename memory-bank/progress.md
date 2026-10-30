@@ -90,10 +90,10 @@
 
 ## In progress
 
-- Waiting for the user: when to run the full evaluation (405 instances x greedy, sequential, resolve, joint). The harness is ready and resumable.
+- Next feature: repair-overrun loop and approval triggers. The full evaluation waits until every feature is built (ADR 0007).
 
 ## Next
 
-- Full evaluation run, results and stats into `docs/results/`; report plan rate per method and per size, the paired Wilcoxon on instances both solved, and the sensitivity view.
+- Contract-net; then the one-seed-per-cell check, then (code frozen) the full evaluation run, results and stats into `docs/results/`; report plan rate per method and per size, the paired Wilcoxon on instances both solved, and the sensitivity view.
 - Officer and facilities interviews (ROADMAP "Now").
 - ITC 2019 loader when the data files exist; repair-overrun re-planning loop, approval triggers, contract-net (v0.3 to v0.5).
