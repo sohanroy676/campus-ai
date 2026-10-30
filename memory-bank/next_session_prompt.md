@@ -27,7 +27,7 @@ Greedy takes up to 437 s on medium (`medium-l75-building-s1`; 230 s on `-buildin
 ## Open items, in order
 1. The medium decision above (and the greedy `check` fix if the user wants it).
 2. Spec assumptions 1-24 in `docs/model-spec.md` section 7 still need the user's confirmation (3 and 19 are resolved). Go through them with the user.
-3. Housekeeping: projectBrief says about 400 scenarios, ROADMAP says 100+ for Gate 2; agree one number with the user.
+3. Scenario count is 405 (frozen v1.0 evaluation set; 20 smoke instances separate). 24 of 405 are frozen. Do not state any other target.
 4. Then: ITC 2019 loader (waits for the user's data files), sequential and re-solve baselines, eval harness and stats (Gate 2), repair-overrun loop and approval triggers, contract-net.
 
 ## Known facts that matter

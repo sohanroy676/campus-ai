@@ -86,3 +86,4 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 - The baseline obeys the rules (including R6 travel). A scenario is only returned if cancelling every movable class is a valid plan.
 - `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
 - Known limit: joint finds no plan within the 10 s first stage for medium at load 90, so do not freeze that combination.
+- Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. `scenarios/frozen/` holds 24 of them so far (12 small, 12 medium).

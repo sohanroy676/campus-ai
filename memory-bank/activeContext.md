@@ -24,8 +24,8 @@ Work is on `feature/medium-tier` (from `main` c253f43 after PR #7, which merged 
 - Long shell heredocs failed in Bash here; write multi-line files with the Write tool.
 
 ## Blockers / open questions
-- Spec assumptions 1 to 24 are confirmed by the user (2026-10-30). Open: agree one scenario count (brief says about 400, ROADMAP 100+).
+- Spec assumptions 1 to 24 are confirmed by the user (2026-10-30). Scenario count is settled: the frozen v1.0 evaluation set is 405 instances (20 smoke instances are separate and not counted); 24 are frozen so far.
 - Decisions for `impact/`: window = plan time (or first affected day start) to the end of the last affected day; affected = overlap a fault or hold; movable = affected plus not-yet-started classes in the window within 10 minutes' walk; faults and holds are clipped to plan time (assumptions 21 to 24, still to confirm). Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Agree one scenario count (brief says about 400, ROADMAP 100+). Then ITC 2019 loader (needs the data files), sequential and re-solve baselines, eval harness and stats (Gate 2), recovery loop with approval triggers, contract-net. Possible: speed up R2/R1 `check` (greedy is still about 112 s on the slowest medium). Push and PR only with approval; watch CI with Monitor (include the secrets job).
+ITC 2019 loader (needs the data files), sequential and re-solve baselines, eval harness and stats (Gate 2), recovery loop with approval triggers, contract-net. Possible: speed up R2/R1 `check` (greedy is still about 112 s on the slowest medium). Push and PR only with approval; watch CI with Monitor (include the secrets job).
