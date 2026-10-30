@@ -35,6 +35,7 @@ class SolverSettings:
     stage_seconds: tuple[float, float, float, float, float, float] = (10, 10, 3, 3, 2, 2)
     num_workers: int = 1
     random_seed: int = 42
+    skip_stages: frozenset[int] = frozenset()  # stage indexes left out of the lexicographic order
 
     @classmethod
     def for_problem(cls, problem: RecoveryProblem) -> "SolverSettings":
@@ -103,6 +104,8 @@ def solve(
     reports: list[StageReport] = []
     best: Plan | None = None
     for index, (name, seconds) in enumerate(zip(STAGE_NAMES, settings.stage_seconds, strict=True)):
+        if index in settings.skip_stages:
+            continue
         expression = stage_expression(ctx, index)  # its helper variables join the model only now
         ctx.model.minimize(expression)
         solver.parameters.max_time_in_seconds = seconds

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from smartcampus.baselines.greedy import greedy
+from smartcampus.baselines.resolve import resolve_from_scratch, resolve_settings
 from smartcampus.domain.events import FaultOccurred, PlanApplied, SafetyHoldPlaced
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
@@ -16,6 +17,7 @@ from smartcampus.solver.solve import SolverSettings, StageReport, solve
 class Method(StrEnum):
     JOINT = "joint"
     GREEDY = "greedy"
+    RESOLVE = "resolve"
 
 
 @dataclass(frozen=True)
@@ -63,6 +65,11 @@ def run_scenario(
         # The greedy plan is complete, so the search starts from a plan instead of from nothing.
         start = greedy(current, based_on_version=version)
         solved = solve(current, used_settings, based_on_version=version, hint=start)
+        plan, stages = solved.plan, solved.stages
+    elif method is Method.RESOLVE:
+        tier = settings or SolverSettings.for_problem(problem)
+        used_settings = resolve_settings(tier)
+        solved = resolve_from_scratch(current, tier, based_on_version=version)
         plan, stages = solved.plan, solved.stages
     else:
         plan = greedy(current, based_on_version=version)
