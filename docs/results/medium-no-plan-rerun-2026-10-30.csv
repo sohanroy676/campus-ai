@@ -1,0 +1,12 @@
+scenario,result,seconds,C,P,D,K,S,T
+medium-l75-building-s15,plan,120.3,0,276,2400,0,2430,10133
+medium-l75-hold-s15,plan,84.8,0,58,0,0,60,1017
+medium-l75-hold-s6,plan,54.1,0,53,0,0,0,2021
+medium-l75-room-s13,plan,57.3,0,88,0,0,0,3061
+medium-l75-room-s7,plan,70.4,0,61,30,0,360,1031
+medium-l90-hold-s10,plan,100.7,0,1732,540,0,990,22527
+medium-l90-hold-s5,plan,113.2,0,1605,1230,0,1470,19500
+medium-l90-hold-s9,plan,101.9,0,1708,720,0,1350,22475
+medium-l90-room-s10,plan,108.8,0,3622,1620,0,3240,51790
+medium-l90-room-s3,plan,105.2,0,147,600,0,690,5085
+medium-l90-room-s8,plan,112.0,0,1954,1110,0,2340,20555

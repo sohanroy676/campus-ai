@@ -23,6 +23,9 @@ STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", 
 
 MEDIUM_STAGE_SECONDS = (30.0, 30.0, 9.0, 9.0, 6.0, 6.0)
 
+# Longest the hint completion may take; it runs before stage 1 and is not part of the stage budget.
+HINT_COMPLETION_SECONDS = 10.0
+
 
 @dataclass(frozen=True)
 class SolverSettings:
@@ -89,6 +92,7 @@ def solve(
         _hint_cancel_everything(ctx)
     else:
         _hint_plan(ctx, hint)
+    _complete_hint(ctx, settings)
 
     solver = cp_model.CpSolver()
     solver.parameters.num_workers = settings.num_workers
@@ -113,7 +117,7 @@ def solve(
         value = round(solver.objective_value)
         ctx.model.add(expression <= value)
         best = _extract_plan(ctx, solver, based_on_version)
-        _hint_solution(ctx, solver)
+        _set_hint(ctx, solver)
         stage_status = StageStatus.OPTIMAL if status == cp_model.OPTIMAL else StageStatus.TIME_LIMIT
         reports.append(StageReport(name, value, stage_status, solver.wall_time))
     assert best is not None
@@ -154,10 +158,31 @@ def _hint_plan(ctx: DecisionVars, plan: Plan) -> None:
         ctx.model.add_hint(var, values[var.index])
 
 
-def _hint_solution(ctx: DecisionVars, solver: cp_model.CpSolver) -> None:
+def _complete_hint(ctx: DecisionVars, settings: SolverSettings) -> None:
+    """Extend the hint to every variable of the model, helper literals included.
+
+    The hint covers only the decision variables; CP-SAT cannot always finish it, and then a valid
+    start plan gives no first solution (medium-l90-room-s3: none in 30 s). Fixing the hinted
+    variables and solving a copy of the model yields values for all the others. If the copy has no
+    solution within the limit, the partial hint is kept.
+    """
+    probe = ctx.model.clone()
+    solver = cp_model.CpSolver()
+    solver.parameters.num_workers = settings.num_workers
+    solver.parameters.random_seed = settings.random_seed
+    solver.parameters.max_time_in_seconds = HINT_COMPLETION_SECONDS
+    solver.parameters.fix_variables_to_their_hinted_value = True
+    if solver.solve(probe) in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        _set_hint(ctx, solver)
+
+
+def _set_hint(ctx: DecisionVars, solver: cp_model.CpSolver) -> None:
+    """Hint every variable that existed when `solver` last solved, with its value there."""
     ctx.model.clear_hints()  # type: ignore[no-untyped-call]  # ortools ships no annotation
-    for var in _all_variables(ctx):
-        ctx.model.add_hint(var, solver.value(var))
+    values = solver.response_proto.solution
+    hint = ctx.model.proto.solution_hint
+    hint.vars.extend(range(len(values)))
+    hint.values.extend(values)
 
 
 def _extract_plan(ctx: DecisionVars, solver: cp_model.CpSolver, version: int) -> Plan:

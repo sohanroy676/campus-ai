@@ -8,7 +8,9 @@ from smartcampus.domain.plan import Assignment, EquipmentMove, Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.domain.time import Interval
 from smartcampus.rules.base import RuleId
+from smartcampus.rules.registry import ALL_RULES
 from smartcampus.rules.validator import validate
+from smartcampus.rules.variables import build_variables
 from smartcampus.solver.explain import explain_infeasibility
 from smartcampus.solver.objective import StageValues, evaluate
 from smartcampus.solver.solve import (
@@ -18,6 +20,8 @@ from smartcampus.solver.solve import (
     SolveResult,
     SolverSettings,
     StageStatus,
+    _complete_hint,
+    _hint_plan,
     solve,
 )
 
@@ -254,3 +258,20 @@ def test_a_hint_naming_things_the_model_lacks_is_ignored() -> None:
         ),
     )
     assert solve(problem, FAST, hint=junk).values == solve(problem, FAST).values
+
+
+def hinted_model(problem: RecoveryProblem, plan: Plan) -> cp_model.CpModel:
+    """The model as `solve` builds it, with `plan` hinted and the hint completed."""
+    ctx = build_variables(problem)
+    for rule in ALL_RULES:
+        rule.post(ctx)
+    _hint_plan(ctx, plan)
+    _complete_hint(ctx, FAST)
+    return ctx.model
+
+
+def test_a_valid_start_plan_is_hinted_on_every_variable_of_the_model() -> None:
+    # An incomplete hint left CP-SAT without a first solution on medium-l90-room-s3 in 30 s.
+    problem = disrupted_with_gpus()
+    model = hinted_model(problem, greedy(problem))
+    assert len(model.proto.solution_hint.vars) == len(model.proto.variables)
