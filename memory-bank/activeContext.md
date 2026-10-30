@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-Work is on `feature/frozen-set` (from `origin/main` after PR #6; 3 commits plus a docs commit, not pushed). Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
+Work is on `feature/medium-tier` (from `main` c253f43 after PR #7, which merged the frozen small set, smaller models and greedy start plan). Decided: separate medium time tier in the spec; fix slow greedy (R6 check indexed by person). Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.

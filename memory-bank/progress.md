@@ -48,7 +48,7 @@
   - `generator/synth.py`: `generate_scenario(size, load, severity, seed)`; sizes small/medium/large, load 10 to 95, severity room/building/hold; `provenance` (generator version, seed, parameters) in the scenario file and in the run report; CLI `smartcampus generate`
   - Spec section 8. 451 tests, coverage 99%
 
-- Frozen small set, R6 re-encoding and greedy start plan on `feature/frozen-set` (3 commits, not pushed) — 2026-10-30
+- Frozen small set, R6 re-encoding and greedy start plan on `feature/frozen-set` (merged as PR #7) — 2026-10-30
   - `scenarios/frozen/` holds the 12 small scenarios (size small x load 50, 75 x room/building/hold x seeds 1, 2); `tests/golden/test_frozen_set.py` regenerates each byte for byte. The 12 medium files are in `scenarios/candidates/medium/`, not frozen
   - Clean run of all 24 (nothing else running): greedy solves all 24; joint solves all 12 small and 7 of 12 medium. Joint's no-plan cases: `medium-l50-building-s2`, `medium-l75-building-s1`, `-hold-s2`, `-room-s1`, `-room-s2`
   - Cause (ADR-0004): R6 looked at every pair of options, about 285 s to build and 1.87M constraints; presolve (about 18 s) used up the 10 s first stage. Fix: R6 grouped by person, time and building (build 3 to 7 s, 160k to 560k constraints); `tests/golden/test_r6_encoding.py` compares it with the old pairwise encoding on all 24 scenarios
@@ -56,7 +56,7 @@
   - After the change, joint returns a plan on `medium-l50-building-s2` but not on the other four. Presolve is still 6 to over 10 s on medium. Greedy takes 23 to 435 s there
   - 491 tests; `ruff`, `mypy src`, `uv run pytest` pass (the full suite takes about 4 minutes)
 
-- Smaller models for R4, R5, R6 and the objective on `feature/frozen-set` (not pushed) — 2026-10-30
+- Smaller models for R4, R5, R6 and the objective on `feature/frozen-set` (merged as PR #7) — 2026-10-30
   - Shared per-class literals and start bounds (`DecisionVars`), R4/R5 rewritten on them, objective helpers built stage by stage (`stage_expression`). `tests/golden/test_equipment_encoding.py` checks old vs new vs validator on all 24 scenarios; existing agreement tests unchanged
   - Medium models went from 160k to 560k constraints to 29k to 116k; presolve on the 5 failing scenarios is 1.9, 2.8, 5.0, 2.4 and 4.3 s (gate was under 5 s). Gate run on all 12 medium: joint returns a plan on 10; no plan on `medium-l75-hold-s2` and `medium-l75-room-s2`. ADR-0004 has the table
   - Greedy takes up to 437 s on medium because `validate()` runs the pairwise R6 `check` for each of its 205 steps (separate defect, not fixed)
