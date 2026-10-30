@@ -52,7 +52,7 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 ## 6. Approval triggers
 `status = pending_approval` for: any cancellation; `P > 100`; any cross-building move; any change less than 30 minutes before start; any safety hold. Demo mode auto-approves and logs it.
 
-## 7. Assumptions (reading choices, to confirm)
+## 7. Assumptions (reading choices, all 24 confirmed by the user on 2026-10-30)
 1. One cohort per activity. R3 and stage P use `cohort.size` in the singular. Faculty is a list.
 2. R5: the 15-minute setup buffer applies once per move (pool to activity). A move occupies `[move_start, move_start + units * move_minutes_per_unit + 15)` with `move_start >= plan_time` and an end at or before the activity's new start. Each move takes one mover; concurrent moves are capped at `staff_available`.
 3. Resolved: source-side contention is part of R4 (see section 3). The return trip takes the same time as the outbound move (`units x move_minutes_per_unit + 15`). It only keeps the units unavailable: it does not use a mover for R5's cap and adds nothing to stage K.
