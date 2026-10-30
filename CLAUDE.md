@@ -10,7 +10,7 @@
 Read on demand: `memory-bank/architecture.md` (module layout, incident flow), `memory-bank/tech-stack.md` (commands, test locations, solver settings), `memory-bank/systemPatterns.md`, `ROADMAP.md`, `docs/adr/` (decision records).
 
 ## Status
-Early stage: the repo holds planning docs and config only (no `src/`, `tests/` or `pyproject.toml` yet). Build order follows `ROADMAP.md` (v0.1/v0.2 first). Don't assume modules from `architecture.md` exist; check first.
+Gate 1 is reached: `src/smartcampus/` has the rules, solver, sim, impact, generator, greedy baseline and CLI `run`/`generate`, with tests. Build order follows `ROADMAP.md`. Modules in `architecture.md` that are not built yet (sequential and re-solve baselines, eval, contract-net, API) may not exist; check first.
 
 ## Commands
 - Install: `uv sync`

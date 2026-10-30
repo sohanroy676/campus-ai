@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-`feature/impact-and-generator` is merged (PR #5; `impact/` only, CI green: `checks` and `secrets`). `main` = `origin/main`, nothing pending. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
+Work is on `feature/frozen-set` (from `origin/main` after PR #6; 3 commits plus a docs commit, not pushed). Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -28,5 +28,5 @@
 - Decisions for `impact/`: window = plan time (or first affected day start) to the end of the last affected day; affected = overlap a fault or hold; movable = affected plus not-yet-started classes in the window within 10 minutes' walk; faults and holds are clipped to plan time (assumptions 21 to 24, still to confirm). Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Generator is on `feature/generator` (unpushed, reviewed by nobody yet). Agree the frozen set with the user (proposal: {small, medium} x load {50, 75} x room/building/hold x seeds 1, 2 = 24; medium at 90 is not solvable by joint in budget) before writing `scenarios/frozen/`. Old plan below.
-Start the seeded generator on a new branch (e.g. `feature/generator`): synthetic first, ITC 2019 loader later when the data files exist. Ask the user for its inputs before writing anything (campus size, load, severity, how many scenarios, what the frozen set holds, the generator version in run records). Then: sequential and re-solve baselines, eval harness and stats, Gate 2, the recovery loop with approval triggers, contract-net. Push and PR only with approval; watch CI with Monitor (include the secrets job).
+Report the medium result to the user and get a decision before touching solver settings. Facts (ADR-0004): after the R6 re-encoding and the greedy start plan, joint solves `medium-l50-building-s2` but not `medium-l75-building-s1`, `-hold-s2`, `-room-s1`, `-room-s2`. Build time is now 3 to 7 s but presolve is 6 to over 10 s, longer than the 10 s first stage; the spec's 10/10/3/3/2/2 split is unchanged. Other constraints still large: R4, R5 and the objective expressions (160k to 560k constraints). Greedy takes 23 to 435 s on medium and now runs before joint.
+Then: confirm spec assumptions 1 to 24 with the user, regenerate CHANGELOG.md, ITC 2019 loader (needs the user's data files), sequential and re-solve baselines, eval harness and stats (Gate 2), the recovery loop with approval triggers, contract-net. Push and PR only with approval; watch CI with Monitor (include the secrets job).

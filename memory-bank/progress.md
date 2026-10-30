@@ -44,14 +44,21 @@
   - Scenario files may omit both `window` and `movable_activity_ids` (one without the other is an error); the demo gives the same scores either way
   - 420 tests, coverage 99% overall and 100% for `impact/`; property tests: derivation is idempotent, no fixed class is left inside a disruption, and a sound timetable stays solvable after any disruption
 
-- Seeded synthetic generator on `feature/generator` (not pushed) — 2026-10-29
+- Seeded synthetic generator (merged as PR #6) — 2026-10-29
   - `generator/synth.py`: `generate_scenario(size, load, severity, seed)`; sizes small/medium/large, load 10 to 95, severity room/building/hold; `provenance` (generator version, seed, parameters) in the scenario file and in the run report; CLI `smartcampus generate`
-  - Spec section 8. Checked: small (loads 50 to 90) and medium (50, 75) solve with both methods; medium at load 90 gives joint no plan within 10 s
-  - 451 tests, coverage 99%; frozen set not yet written (needs approval)
+  - Spec section 8. 451 tests, coverage 99%
+
+- Frozen small set, R6 re-encoding and greedy start plan on `feature/frozen-set` (3 commits, not pushed) — 2026-10-30
+  - `scenarios/frozen/` holds the 12 small scenarios (size small x load 50, 75 x room/building/hold x seeds 1, 2); `tests/golden/test_frozen_set.py` regenerates each byte for byte. The 12 medium files are in `scenarios/candidates/medium/`, not frozen
+  - Clean run of all 24 (nothing else running): greedy solves all 24; joint solves all 12 small and 7 of 12 medium. Joint's no-plan cases: `medium-l50-building-s2`, `medium-l75-building-s1`, `-hold-s2`, `-room-s1`, `-room-s2`
+  - Cause (ADR-0004): R6 looked at every pair of options, about 285 s to build and 1.87M constraints; presolve (about 18 s) used up the 10 s first stage. Fix: R6 grouped by person, time and building (build 3 to 7 s, 160k to 560k constraints); `tests/golden/test_r6_encoding.py` compares it with the old pairwise encoding on all 24 scenarios
+  - `solve(..., hint=plan)`; `run_scenario` passes the greedy plan for `joint`
+  - After the change, joint returns a plan on `medium-l50-building-s2` but not on the other four. Presolve is still 6 to over 10 s on medium. Greedy takes 23 to 435 s there
+  - 491 tests; `ruff`, `mypy src`, `uv run pytest` pass (the full suite takes about 4 minutes)
 
 ## In progress
 
-- `feature/generator` awaits review; frozen set in `scenarios/frozen/` still to be agreed.
+- Medium is not frozen. Presolve time on medium is above the 10 s first stage; solver settings are unchanged (needs the user's decision).
 
 ## Next
 
