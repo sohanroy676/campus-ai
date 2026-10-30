@@ -1,5 +1,6 @@
 """Run one scenario with one method: log the disruption, plan, check, apply the plan as an event."""
 
+import time
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -31,6 +32,8 @@ class RunResult:
     stages: tuple[StageReport, ...]  # empty for methods that do not solve in stages
     settings: SolverSettings | None  # None for methods without solver settings
     log_version: int  # events in the log after the plan was applied
+    planning_seconds: float = 0.0  # wall time to build the plan, start plan included
+    start_plan_seconds: float = 0.0  # of which the greedy start plan (joint only)
 
 
 def seed_disruptions(store: EventStore, problem: RecoveryProblem) -> None:
@@ -60,12 +63,15 @@ def run_scenario(
     current = store.state.problem(base)
     version = store.version
 
+    started = time.monotonic()
+    start_plan_seconds = 0.0
     stages: tuple[StageReport, ...] = ()
     used_settings: SolverSettings | None = None
     if method is Method.JOINT:
         used_settings = settings or SolverSettings.for_problem(problem)
         # The greedy plan is complete, so the search starts from a plan instead of from nothing.
         start = greedy(current, based_on_version=version)
+        start_plan_seconds = time.monotonic() - started
         solved = solve(current, used_settings, based_on_version=version, hint=start)
         plan, stages = solved.plan, solved.stages
     elif method is Method.RESOLVE:
@@ -80,6 +86,7 @@ def run_scenario(
     else:
         plan = greedy(current, based_on_version=version)
 
+    planning_seconds = time.monotonic() - started
     assert_valid(current, plan)  # independent re-check with the shared rule library
     store.append(PlanApplied(version=store.version, at_min=current.plan_time_min, plan=plan))
     [applied] = store.state.applied_plans
@@ -91,4 +98,6 @@ def run_scenario(
         stages=stages,
         settings=used_settings,
         log_version=store.version,
+        planning_seconds=planning_seconds,
+        start_plan_seconds=start_plan_seconds,
     )

@@ -99,3 +99,11 @@ All methods plan the same movable classes under the same hard rules (section 3) 
   3. Timing: the classes still cancelled are retried with a free start (and room and equipment moves); every other class stays as it is. Stages C, D, S, T.
   Time: each pass gets the tier's seconds for its stages, scaled so the three passes together use the tier's total. The plan from pass 3 is the result and is checked by the validator.
 - **Joint** (section 5) is the method under test; **contract-net** is specified when it is built.
+
+## 10. Evaluation
+`smartcampus eval <dir> --methods all --out <dir>` runs each method on each scenario with a fresh event log, `num_workers = 1` and `random_seed = 42`, and appends one record per (instance, method) to `results.jsonl` (an interrupted run resumes). `report.md` is written from those records. `smartcampus compare <scenario>` runs the methods on one scenario.
+- Record: the six stage values of the plan, planning time (for joint, also the greedy start plan inside it, so greedy and joint time are reported separately), and, for a method with no plan, the reason and the cancel-everything score of the instance.
+- Summaries: median and interquartile range per metric on each method's own solved instances; plan rate per method; per size and overall.
+- Comparison of joint against each comparator on the instances both solved: win / tie / loss on the lexicographic order (a win is a strictly better score), and a two-sided paired Wilcoxon test per metric on the differences (zero differences are dropped; no test is reported when all differ by zero).
+- Sensitivity on every instance both methods were run on: a method without a plan is scored as the cancel-everything plan and counts as a loss against a method with a plan; two methods without a plan tie.
+- A method without a plan is reported as a solver limit.
