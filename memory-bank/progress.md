@@ -100,9 +100,13 @@
   - Initial auction equals greedy (same order, same costs), so the result is never worse than greedy unless the limit ends the auction early. Seen: small load 90 hold seed 2 cancellations 2 to 1; `small-l75-building-s1` P 2249 to 2101 but still 5 cancellations (joint 2), 30 s limit used
   - `tests/unit/test_contract_net.py`
 
+- Eval records stamped on `feature/recovery-loop` (local) - 2026-10-30
+  - `RunRecord` gains `commit` (`code_version()`, "+dirty" if tracked files differ), `generator_version`, `stage_seconds`, `num_workers`, `random_seed` (defaults keep older records loadable; greedy has no settings). The report names the code and warns on mixed commits or unstamped runs, and the threats list now includes contract-net's wall-clock limit
+  - Start the final run from a clean tree and an empty `results/` so one commit covers every record
+
 ## In progress
 
-- Next: stamp eval records with commit, settings and generator version; then the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).
+- Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).
 
 ## Next
 

@@ -24,4 +24,4 @@ Neither check is reported as a result. Before any run that is kept, each record 
 - One expensive run, with every comparator on the same code, so the results can be traced to one commit.
 - Large no-plans and harness defects are found early by the cheap checks, not at the end.
 - The evidence for the headline question (does joint beat sequential, can contract-net match it) arrives late; if time runs short, the optional results page is cut before the evaluation is.
-- The records need the code version added before the final run (to do).
+- The records carry the git commit ("+dirty" if the tree had uncommitted changes), the generator version, and the solver tier, workers and seed (done 2026-10-30). The report names the code and warns when one results file mixes commits or holds unstamped runs; start the final run from a clean tree and an empty `results/`.
