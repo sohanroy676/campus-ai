@@ -56,9 +56,15 @@
   - After the change, joint returns a plan on `medium-l50-building-s2` but not on the other four. Presolve is still 6 to over 10 s on medium. Greedy takes 23 to 435 s there
   - 491 tests; `ruff`, `mypy src`, `uv run pytest` pass (the full suite takes about 4 minutes)
 
+- Smaller models for R4, R5, R6 and the objective on `feature/frozen-set` (not pushed) — 2026-10-30
+  - Shared per-class literals and start bounds (`DecisionVars`), R4/R5 rewritten on them, objective helpers built stage by stage (`stage_expression`). `tests/golden/test_equipment_encoding.py` checks old vs new vs validator on all 24 scenarios; existing agreement tests unchanged
+  - Medium models went from 160k to 560k constraints to 29k to 116k; presolve on the 5 failing scenarios is 1.9, 2.8, 5.0, 2.4 and 4.3 s (gate was under 5 s). Gate run on all 12 medium: joint returns a plan on 10; no plan on `medium-l75-hold-s2` and `medium-l75-room-s2`. ADR-0004 has the table
+  - Greedy takes up to 437 s on medium because `validate()` runs the pairwise R6 `check` for each of its 205 steps (separate defect, not fixed)
+  - 515 tests, `ruff`, `mypy src` pass; the full suite takes about 5.5 minutes
+
 ## In progress
 
-- Medium is not frozen. Presolve time on medium is above the 10 s first stage; solver settings are unchanged (needs the user's decision).
+- Medium is not frozen: two of 12 get no plan after two rounds of shrinking. Decision needed: a separate medium time tier in the spec, or leave medium out of the frozen set. Solver settings are unchanged (10/10/3/3/2/2).
 
 ## Next
 
