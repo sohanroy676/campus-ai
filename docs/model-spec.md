@@ -87,3 +87,15 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 - `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
 - Medium at load 90 (checked 2026-10-30 with the medium tier of section 5, seeds 1 and 2, room/building/hold): joint returns a plan on all 6, so the combination stays in the frozen set. Greedy start plan 5 to 367 s, first-stage presolve 0.9 to 4.5 s, total 18 to 460 s per scenario.
 - Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. The grid is 3 sizes x loads 50, 75, 90 x severities room, building, hold x seeds 1 to 15 = 135 per size. `scenarios/frozen/` holds all 405 (135 per size); large was frozen once its time tier was piloted (ADR 0006). Timing runs: `docs/results/solver-timing-2026-10-30.md`.
+
+## 9. Baselines
+All methods plan the same movable classes under the same hard rules (section 3) and are scored with the same stage values (section 4). Hard rules are never re-implemented in a baseline.
+
+- **Greedy**: classes in order of original start, each takes the cheapest valid placement by P, D, K, S, T; a class with none is cancelled.
+- **Re-solve from scratch**: the joint model without the minimal-change stages. P, D and S are dropped, C, K and T are kept, there is no start-plan hint, and the total time is the tier's with the time of the dropped stages split equally between C and K. P, D and S are still computed on its plan.
+- **Sequential per-domain repair** (rooms, then equipment, then timing). Three CP-SAT solves of the joint model; each fixes what the earlier ones decided and opens only its own domain, so no pass can trade one domain against another. Each pass is a restriction of the model (decision variables fixed or forbidden); no rule is relaxed or duplicated.
+  1. Rooms: every movable class keeps its original start and no equipment is moved. Stages C, P, T. A class that needs equipment its candidate rooms do not hold is cancelled here.
+  2. Equipment: the classes cancelled by pass 1 are retried at their original start with equipment moves allowed (a room, and units moved in under R4 and R5); every other class stays as pass 1 left it. Stages C, K, T.
+  3. Timing: the classes still cancelled are retried with a free start (and room and equipment moves); every other class stays as it is. Stages C, D, S, T.
+  Time: each pass gets the tier's seconds for its stages, scaled so the three passes together use the tier's total. The plan from pass 3 is the result and is checked by the validator.
+- **Joint** (section 5) is the method under test; **contract-net** is specified when it is built.

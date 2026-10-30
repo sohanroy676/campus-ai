@@ -4,6 +4,7 @@ After each stage its optimum is fixed as a constraint ("stage value <= optimum")
 stage runs. A stage that hits its time limit keeps the best solution it found.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -85,13 +86,20 @@ def solve(
     *,
     based_on_version: int = 0,
     hint: Plan | None = None,
+    restrict: Callable[[DecisionVars], None] | None = None,
 ) -> SolveResult:
-    """`hint` is a plan to start the search from; without one it starts from cancel-everything."""
+    """`hint` is a plan to start the search from; without one it starts from cancel-everything.
+
+    `restrict` may fix or forbid decision variables after the rules are posted (the sequential
+    baseline uses it to hold earlier passes fixed); it must not encode any rule.
+    """
     settings = settings or SolverSettings()
     ctx = build_variables(problem)
     for rule in ALL_RULES:
         rule.post(ctx)
         ctx.model.add(ctx.rule_lit[rule.id] == 1)
+    if restrict is not None:
+        restrict(ctx)
     if hint is None:
         _hint_cancel_everything(ctx)
     else:
