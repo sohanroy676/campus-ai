@@ -104,6 +104,8 @@
   - `RunRecord` gains `commit` (`code_version()`, "+dirty" if tracked files differ), `generator_version`, `stage_seconds`, `num_workers`, `random_seed` (defaults keep older records loadable; greedy has no settings). The report names the code and warns on mixed commits or unstamped runs, and the threats list now includes contract-net's wall-clock limit
   - Start the final run from a clean tree and an empty `results/` so one commit covers every record
 
+- Contract-net subset check (not a result; 14 frozen instances: 6 small, 4 medium, 4 large; greedy and contract_net; commit a7f4f75; files in gitignored `var/cn-out/`) - 2026-10-30: plan on 28 of 28. Contract-net was better than greedy on 9, equal on 5, worse on none (lexicographic). It hit its time cap on 5 (large-l90-building-s1 180 s, medium-l75-building-s1 and medium-l90-hold-s1 90 s, small-l75-building-s1 and small-l90-building-s1 30 s). Largest gain: large-l90-building-s1 cancellations 5 to 1. Median time 28.8 s against greedy 6.0 s. Joint not run on the subset
+
 ## In progress
 
 - Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).

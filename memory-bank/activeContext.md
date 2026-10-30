@@ -39,5 +39,7 @@ Work is on `feature/frozen-grid` (from `main` d179f78), pushed to `origin/featur
 ## Contract-net (feature/recovery-loop)
 - Built and in spec section 9. Time limit = the tier's total solver seconds, wall clock; on medium and large the initial auction (as slow as greedy, 90 s or more) may use most of it, so those results can be limit-bound: check on the ~20-instance subset before the full run. Agents hold no rule logic: a room agent bids for rooms of the wrong type too and the validator refuses them (same cost as greedy).
 
+- Contract-net subset check done (see progress.md): no large or medium no-plans, 5 of 14 runs limit-bound. The one-seed-per-cell check (27 instances, about 2 hours, greedy and joint at least) is the remaining cheap check.
+
 ## Next step
 Decision (ADR 0007): implement everything first, run the full evaluation once at the end. Order: (repair-overrun loop, approval triggers, contract-net and eval stamping: done on `feature/recovery-loop`, local); one-seed-per-cell check (27 instances); optional results page; freeze, then the full run. ITC 2019 loader only if the user has the data files. Possible: greedy and resolve times on large; speed up R2/R1 `check`. Push and PR only with approval; watch CI with Monitor (include the secrets job).
