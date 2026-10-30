@@ -3,35 +3,27 @@
 Continue work on campus-ai (D:\Programming\campus-ai). CLAUDE.md and the memory-bank are loaded.
 
 ## State
-- `main` holds the generator (PR #6) and, after this session's PR, the frozen small set, the smaller R4/R5/R6/objective models and the greedy start plan. Check `git log` and `gh pr list` to confirm what landed and that CI was green (`checks` and `secrets`). 515 tests.
-- `scenarios/frozen/` holds 12 small scenarios (never edit them); medium was frozen on feature/medium-tier.
-- ADR-0004 has the numbers. Merged feature branches still exist; do not delete them.
+- `main` holds everything through `feature/medium-tier`: the medium time tier (ADR 0005), 24 frozen scenarios (12 small, 12 medium), the faster greedy (R6 `check` indexed by person), spec assumptions 1-24 confirmed (2026-10-30) and the scenario count settled. Check `git log` and the CI runs, and confirm `checks` and `secrets` were green. 543 tests.
+- Scenario count: the frozen v1.0 evaluation set is 405 instances; 20 smoke instances are separate and not counted. 24 of 405 are frozen. Do not state any other target; Gate 2 reports progress against 405.
+- Joint solves all 12 medium scenarios with the 30/30/9/9/6/6 s tier (small keeps 10/10/3/3/2/2 s). Large has no measured tier yet and reuses the medium one.
+- Merged feature branches still exist; do not delete them. Never edit `scenarios/frozen/`.
 
-## Open decision (ask the user first)
-Joint returns a plan on 10 of 12 medium scenarios; still none on `medium-l75-hold-s2` (presolve 5.0 s) and `medium-l75-room-s2` (presolve 4.3 s, no solution in the 10 s first stage). On `medium-l75-building-s1` and `-building-s2` stage 1 ends at its time limit and later stages get no time. The spec split 10/10/3/3/2/2 is unchanged. Options:
-1. A separate medium time tier in the spec (my recommendation). Presolve alone makes a 10 s first stage unrealistic at this size.
-2. Leave medium out of the frozen set and evaluate on the 12 small ones.
-3. One more shrinking round on R2 (room-slot at-most-one groups; leaving R2 out saved about 2 s of presolve on `hold-s2`) before deciding.
-Medium is frozen in a later commit only if joint returns a plan on all 12.
-
-## Separate defect: greedy is slow
-Greedy takes up to 437 s on medium (`medium-l75-building-s1`; 230 s on `-building-s2`). Cause: it calls `validate()` on the whole timetable for each of its 205 candidate steps, and 80% of that is the pairwise loop in R6's `check` (38 million `shares_person` calls). Fix idea: index `check` by person and process pairs in the same order so the violations list is identical. Keep greedy time out of joint time comparisons; `joint` now runs greedy first (its plan is the start hint).
+## Open items, in order
+1. Grow the frozen set toward 405: decide the grid (sizes, loads, severities, seeds; large needs a measured time tier) and write it into the spec and `tests/golden/test_frozen_set.py`. Bump `GENERATOR_VERSION` only if output for a seed changes.
+2. Sequential and re-solve baselines (`baselines/`), then the eval harness and stats (Gate 2): medians and IQR, win/tie/loss, paired Wilcoxon, `num_workers=1`, seed 42.
+3. ITC 2019 loader: waits for the user's data files (`data/itc2019/`, gitignored). Ask the user.
+4. Repair-overrun loop and approval triggers (spec section 6), then contract-net.
+5. Optional: greedy is still about 112 s on `medium-l75-building-s1`; the rest is the R2 and R1 `check` (index them like R6, same output order).
 
 ## Environment (Windows)
 - `export PATH="$HOME/.local/bin:$PATH"` for uv. gh is at "C:\Program Files\GitHub CLI\gh.exe" (sohanroy676).
-- Write files as UTF-8 without BOM and LF; use the Write tool for long files.
-- Commit trailer: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Do not push or merge without approval. After a push, watch CI with Monitor (`gh pr checks`), report every terminal state including `secrets`, and do not report green unless seen.
-- A Monitor expires after 30 minutes at most and does not stop a script started with `nohup`; for long runs write to a log and watch the log. Do not run two timed jobs at once (they share the CPU and can fail a time-limited solve).
-- The full suite takes about 5.5 minutes (the two golden equivalence suites are about 4 minutes of that).
-
-## Open items, in order
-1. The medium decision above (and the greedy `check` fix if the user wants it).
-2. Spec assumptions 1-24 in `docs/model-spec.md` section 7 still need the user's confirmation (3 and 19 are resolved). Go through them with the user.
-3. Scenario count is 405 (frozen v1.0 evaluation set; 20 smoke instances separate). 24 of 405 are frozen. Do not state any other target.
-4. Then: ITC 2019 loader (waits for the user's data files), sequential and re-solve baselines, eval harness and stats (Gate 2), repair-overrun loop and approval triggers, contract-net.
+- Write files as UTF-8 without BOM; in Python pass `encoding="utf-8"` and `newline=""` (docs and memory-bank files use CRLF in the working copy). Use the Write tool for long files.
+- Commit trailer: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Do not push or merge without approval. After a push, watch CI with Monitor (`gh run watch` / `gh pr checks`), report every terminal state including `secrets`, and do not report green unless seen.
+- A Monitor expires after 30 minutes at most; for long runs write to a log and watch the log. Do not run two timed jobs at once (they share the CPU and can fail a time-limited solve).
+- The full suite takes about 7 minutes (run it in the background and watch it with Monitor).
 
 ## Known facts that matter
-- Medium models: 29k to 116k constraints, 1.0 to 2.4 s build, presolve 1.9 to 5.0 s on the five scenarios that had no plan. Each presolve pass probes every Boolean, so cost follows the number of Booleans and at-most-one groups, not the constraint count.
-- `DecisionVars` now has shared literals (`any_happens`, `building_start_literals`, `start_literals`, `placed_literal`, `start_bounds`). They are "implied by" literals except `placed_literal` (it implies a placement). Use them in a rule only in the direction that fits.
-- `stage_expression(ctx, i)` builds one stage's helper variables; `stage_expressions(ctx)` still returns all six (tests use it).
-- Changing the output for a given seed means bumping `GENERATOR_VERSION`.
+- `SolverSettings.for_problem(problem)` picks the tier from `provenance.size`; no provenance counts as small.
+- `DecisionVars` has shared literals (`any_happens`, `building_start_literals`, `start_literals`, `placed_literal`, `start_bounds`). They are "implied by" literals except `placed_literal`.
+- `stage_expression(ctx, i)` builds one stage; `stage_expressions(ctx)` returns all six (tests use it).
+- In a loop log that prints the score before the next header, a score belongs to the scenario above its header line.
