@@ -69,14 +69,19 @@ def solve(
     settings: SolverSettings | None = None,
     *,
     based_on_version: int = 0,
+    hint: Plan | None = None,
 ) -> SolveResult:
+    """`hint` is a plan to start the search from; without one it starts from cancel-everything."""
     settings = settings or SolverSettings()
     ctx = build_variables(problem)
     for rule in ALL_RULES:
         rule.post(ctx)
         ctx.model.add(ctx.rule_lit[rule.id] == 1)
     expressions = stage_expressions(ctx)
-    _hint_cancel_everything(ctx)
+    if hint is None:
+        _hint_cancel_everything(ctx)
+    else:
+        _hint_plan(ctx, hint)
 
     solver = cp_model.CpSolver()
     solver.parameters.num_workers = settings.num_workers
@@ -121,6 +126,26 @@ def _hint_cancel_everything(ctx: DecisionVars) -> None:
     cancelled = {var.index for var in ctx.cancelled.values()}
     for var in _all_variables(ctx):
         ctx.model.add_hint(var, 1 if var.index in cancelled else 0)
+
+
+def _hint_plan(ctx: DecisionVars, plan: Plan) -> None:
+    """Start the search from `plan`; anything the plan does not use is hinted to 0."""
+    placed = {(a.activity_id, a.room_id, a.start_min) for a in plan.assignments}
+    moves = {(m.activity_id, m.pool_id): m for m in plan.moves}
+    values = {var.index: 0 for var in _all_variables(ctx)}
+    for activity_id, options in ctx.options.items():
+        for o in options:
+            if o.var is not None and (activity_id, o.room.id, o.start) in placed:
+                values[o.var.index] = 1
+    for activity_id in plan.cancelled & set(ctx.cancelled):
+        values[ctx.cancelled[activity_id].index] = 1
+    for key, move in moves.items():
+        if key in ctx.moved:
+            values[ctx.moved[key].index] = 1
+            values[ctx.units[key].index] = move.units
+            values[ctx.move_start[key].index] = move.start_min
+    for var in _all_variables(ctx):
+        ctx.model.add_hint(var, values[var.index])
 
 
 def _hint_solution(ctx: DecisionVars, solver: cp_model.CpSolver) -> None:

@@ -2,7 +2,9 @@ import pytest
 from builders import at, evolve, make_activity, make_problem
 from ortools.sat.python import cp_model
 
+from smartcampus.baselines.greedy import greedy
 from smartcampus.domain.entities import Cohort, Fault
+from smartcampus.domain.plan import Assignment, EquipmentMove, Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.domain.time import Interval
 from smartcampus.rules.base import RuleId
@@ -217,3 +219,38 @@ def test_a_later_stage_that_times_out_keeps_the_plan_so_far(
     assert validate(problem, result.plan) == []
     assert result.values.cancellations == expected.values.cancellations
     assert result.values.people_moved == expected.values.people_moved
+
+
+def disrupted_with_gpus() -> RecoveryProblem:
+    return evolve(
+        make_problem(activities=(make_activity(required_equipment={"gpu": 3}),)),
+        faults=closed("A1"),
+    )
+
+
+def test_a_greedy_hint_does_not_change_the_optimum() -> None:
+    for problem in (evolve(make_problem(), faults=closed("A1")), disrupted_with_gpus()):
+        start = greedy(problem)
+        hinted = solve(problem, FAST, hint=start)
+        plain = solve(problem, FAST)
+        assert hinted.values == plain.values
+        assert hinted.plan == plain.plan
+
+
+def test_a_bad_hint_only_costs_search_time_not_the_answer() -> None:
+    problem = disrupted_with_gpus()
+    worst = Plan(based_on_version=0, assignments=(), cancelled=frozenset({"act1"}), moves=())
+    assert solve(problem, FAST, hint=worst).values == solve(problem, FAST).values
+
+
+def test_a_hint_naming_things_the_model_lacks_is_ignored() -> None:
+    problem = evolve(make_problem(), faults=closed("A1"))
+    junk = Plan(
+        based_on_version=0,
+        assignments=(Assignment(activity_id="act1", room_id="nowhere", start_min=TUE_10),),
+        cancelled=frozenset({"ghost"}),
+        moves=(
+            EquipmentMove(pool_id="none", activity_id="ghost", units=1, start_min=0, end_min=20),
+        ),
+    )
+    assert solve(problem, FAST, hint=junk).values == solve(problem, FAST).values
