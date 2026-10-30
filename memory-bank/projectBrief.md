@@ -4,7 +4,7 @@
 A simulated campus that recovers from disruptions, such as a lab lost to an AC failure. It re-plans rooms, equipment and timing together in one CP-SAT model while changing as little as possible. It is built for the timetabling officer who approves re-plans. Students, faculty and examiners judge it by the evidence it produces.
 
 ## v1 goal
-Show, on about 400 generated scenarios, whether joint minimal-change recovery beats sequential per-domain repair. Also show whether contract-net negotiation between agents can match a centralized solver.
+Show, on the 405 instances of the frozen v1.0 evaluation set (20 smoke instances are separate and not counted), whether joint minimal-change recovery beats sequential per-domain repair. Also show whether contract-net negotiation between agents can match a centralized solver.
 
 ## Success criteria
 - No plan from our system breaks a hard rule. The shared rule library checks every plan.

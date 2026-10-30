@@ -8,7 +8,7 @@
 - Seeded synthetic generator is done (`smartcampus generate`, spec section 8). Still to do: the frozen scenario set and an ITC 2019 loader (waits for the data files).
 - Repair-overrun and second-event re-planning loop (the events and stale-plan rejection exist in `sim/`, and `impact/` derives the window and movable set) and approval triggers.
 - Sequential and re-solve baselines, a contract-net variant and the evaluation harness.
-- Gate 2: all comparators run on 100+ scenarios. If not, the stretch goals are dropped.
+- Gate 2: all comparators run on the 405-instance frozen v1.0 evaluation set (20 smoke instances are separate and not counted). Progress: 24 of 405 frozen. If not met, the stretch goals are dropped.
 - Results view through FastAPI and a simple React page.
 
 ## Later ideas (only if Gate 2 passes, or after v1.0)

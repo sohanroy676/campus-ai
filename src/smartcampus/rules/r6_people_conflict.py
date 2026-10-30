@@ -35,28 +35,43 @@ def is_too_far(problem: RecoveryProblem, first: Placement, second: Placement) ->
 def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
     out: list[Violation] = []
     found = placements(problem, plan)
-    for i, p in enumerate(found):
-        for q in found[i + 1 :]:
-            if not shares_person(p, q):
-                continue
-            ids = tuple(sorted((p.activity.id, q.activity.id)))
-            rooms = tuple(sorted({p.room.id, q.room.id}))
-            if intervals_overlap(p.start, p.end, q.start, q.end):
-                out.append(
-                    Violation(
-                        RuleId.R6, f"{ids[0]} and {ids[1]} share a person and overlap", ids, rooms
-                    )
+    # Only placements that share a cohort or faculty member and touch in time can conflict.
+    # Per person, sort by start and sweep; pairs are then checked in the order of a loop over all
+    # i < j, so the violation list is the same as comparing every pair.
+    by_person: dict[str, list[int]] = defaultdict(list)
+    for index, placement in enumerate(found):
+        a = placement.activity
+        for person in (f"cohort:{a.cohort_id}", *(f"faculty:{f}" for f in a.faculty_ids)):
+            by_person[person].append(index)
+    touching: set[tuple[int, int]] = set()
+    for indices in by_person.values():
+        indices.sort(key=lambda k: found[k].start)
+        for pos, i in enumerate(indices):
+            end = found[i].end
+            for j in indices[pos + 1 :]:
+                if found[j].start > end:
+                    break
+                touching.add((min(i, j), max(i, j)))
+    for i, j in sorted(touching):
+        p, q = found[i], found[j]
+        ids = tuple(sorted((p.activity.id, q.activity.id)))
+        rooms = tuple(sorted({p.room.id, q.room.id}))
+        if intervals_overlap(p.start, p.end, q.start, q.end):
+            out.append(
+                Violation(
+                    RuleId.R6, f"{ids[0]} and {ids[1]} share a person and overlap", ids, rooms
                 )
-            elif is_too_far(problem, p, q):
-                out.append(
-                    Violation(
-                        RuleId.R6,
-                        f"{ids[0]} and {ids[1]} are back-to-back with more than "
-                        f"{MAX_BACK_TO_BACK_TRAVEL_MIN} minutes between buildings",
-                        ids,
-                        rooms,
-                    )
+            )
+        elif is_too_far(problem, p, q):
+            out.append(
+                Violation(
+                    RuleId.R6,
+                    f"{ids[0]} and {ids[1]} are back-to-back with more than "
+                    f"{MAX_BACK_TO_BACK_TRAVEL_MIN} minutes between buildings",
+                    ids,
+                    rooms,
                 )
+            )
     return out
 
 

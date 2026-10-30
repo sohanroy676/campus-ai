@@ -31,7 +31,7 @@ from smartcampus.rules.variables import DecisionVars, build_variables
 
 ROOT = Path(__file__).parents[2] / "scenarios"
 SMALL = sorted((ROOT / "frozen").glob("small-*.json"))
-MEDIUM = sorted((ROOT / "candidates" / "medium").glob("medium-*.json"))
+MEDIUM = sorted((ROOT / "frozen").glob("medium-*.json"))
 
 
 def post_pairwise(ctx: DecisionVars, kept: set[int]) -> None:

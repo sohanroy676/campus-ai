@@ -4,7 +4,7 @@ Continue work on campus-ai (D:\Programming\campus-ai). CLAUDE.md and the memory-
 
 ## State
 - `main` holds the generator (PR #6) and, after this session's PR, the frozen small set, the smaller R4/R5/R6/objective models and the greedy start plan. Check `git log` and `gh pr list` to confirm what landed and that CI was green (`checks` and `secrets`). 515 tests.
-- `scenarios/frozen/` holds 12 small scenarios (never edit them). The 12 medium scenarios are candidates in `scenarios/candidates/medium/`, not frozen.
+- `scenarios/frozen/` holds 12 small scenarios (never edit them); medium was frozen on feature/medium-tier.
 - ADR-0004 has the numbers. Merged feature branches still exist; do not delete them.
 
 ## Open decision (ask the user first)
@@ -27,7 +27,7 @@ Greedy takes up to 437 s on medium (`medium-l75-building-s1`; 230 s on `-buildin
 ## Open items, in order
 1. The medium decision above (and the greedy `check` fix if the user wants it).
 2. Spec assumptions 1-24 in `docs/model-spec.md` section 7 still need the user's confirmation (3 and 19 are resolved). Go through them with the user.
-3. Housekeeping: projectBrief says about 400 scenarios, ROADMAP says 100+ for Gate 2; agree one number with the user.
+3. Scenario count is 405 (frozen v1.0 evaluation set; 20 smoke instances separate). 24 of 405 are frozen. Do not state any other target.
 4. Then: ITC 2019 loader (waits for the user's data files), sequential and re-solve baselines, eval harness and stats (Gate 2), repair-overrun loop and approval triggers, contract-net.
 
 ## Known facts that matter

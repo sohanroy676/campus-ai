@@ -59,7 +59,7 @@ def run_scenario(
     stages: tuple[StageReport, ...] = ()
     used_settings: SolverSettings | None = None
     if method is Method.JOINT:
-        used_settings = settings or SolverSettings()
+        used_settings = settings or SolverSettings.for_problem(problem)
         # The greedy plan is complete, so the search starts from a plan instead of from nothing.
         start = greedy(current, based_on_version=version)
         solved = solve(current, used_settings, based_on_version=version, hint=start)

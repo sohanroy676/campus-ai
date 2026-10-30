@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-Work is on `feature/frozen-set` (from `origin/main` after PR #6; 3 commits plus a docs commit, not pushed). Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
+Work is on `feature/medium-tier` (from `main` c253f43 after PR #7, which merged the frozen small set, smaller models and greedy start plan). Done: medium time tier (ADR 0005), medium frozen (24 scenarios), greedy R6 check indexed. Not pushed. Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -24,9 +24,8 @@ Work is on `feature/frozen-set` (from `origin/main` after PR #6; 3 commits plus 
 - Long shell heredocs failed in Bash here; write multi-line files with the Write tool.
 
 ## Blockers / open questions
-- Assumptions in `docs/model-spec.md` section 7 (1 to 20) still need the user's confirmation, except 3 (resolved by extending R4) and 19 (resolved: new stage S, distance from the original start, between K and T; 20 stays as is). A stage placed after T would not have fixed 19, because T already prefers the lower room index.
+- Spec assumptions 1 to 24 are confirmed by the user (2026-10-30). Scenario count is settled: the frozen v1.0 evaluation set is 405 instances (20 smoke instances are separate and not counted); 24 are frozen so far.
 - Decisions for `impact/`: window = plan time (or first affected day start) to the end of the last affected day; affected = overlap a fault or hold; movable = affected plus not-yet-started classes in the window within 10 minutes' walk; faults and holds are clipped to plan time (assumptions 21 to 24, still to confirm). Approval triggers (spec section 6) are not built: `run` applies the plan directly.
 
 ## Next step
-Medium: two rounds of shrinking done (ADR-0004 update). Joint now returns a plan on 10 of 12 medium scenarios; still none on `medium-l75-hold-s2` and `medium-l75-room-s2`. Presolve is 1.9 to 5.0 s; each presolve pass probes every Boolean, so the cost follows the number of Booleans and at-most-one groups. Needs the user's decision: a separate medium time tier in the spec, or leave medium out of the frozen set. Do not change the 10/10/3/3/2/2 split without it. Greedy is a separate defect (`validate()` runs the pairwise R6 `check` for each step; up to 437 s on medium); fix idea: index `check` by person with the same output order.
-Then: confirm spec assumptions 1 to 24 with the user, regenerate CHANGELOG.md, ITC 2019 loader (needs the user's data files), sequential and re-solve baselines, eval harness and stats (Gate 2), the recovery loop with approval triggers, contract-net. Push and PR only with approval; watch CI with Monitor (include the secrets job).
+ITC 2019 loader (needs the data files), sequential and re-solve baselines, eval harness and stats (Gate 2), recovery loop with approval triggers, contract-net. Possible: speed up R2/R1 `check` (greedy is still about 112 s on the slowest medium). Push and PR only with approval; watch CI with Monitor (include the secrets job).

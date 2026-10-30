@@ -45,13 +45,14 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 
 ## 5. Solver
 - 30 s total limit, spread across the stages as 10 / 10 / 3 / 3 / 2 / 2 s. Each stage keeps the best solution it found.
+- Time tiers by scenario size (from `provenance.size`; a scenario without provenance counts as small): small keeps 30 s as above; medium and large get 90 s, split 30 / 30 / 9 / 9 / 6 / 6 s. Reason: on medium the presolve alone takes 2 to 5 s and a 10 s first stage often ends with no plan (ADR 0005). Callers can still pass explicit settings.
 - `num_workers = 1` and `random_seed = 42` for tests, evaluation and the demo.
 - Infeasibility: the model can always cancel, so a real "no solution" means bad input and is an error. For rejected-option explanations, each rule R1 to R8 sits behind an assumption literal and the conflicting rules are reported.
 
 ## 6. Approval triggers
 `status = pending_approval` for: any cancellation; `P > 100`; any cross-building move; any change less than 30 minutes before start; any safety hold. Demo mode auto-approves and logs it.
 
-## 7. Assumptions (reading choices, to confirm)
+## 7. Assumptions (reading choices, all 24 confirmed by the user on 2026-10-30)
 1. One cohort per activity. R3 and stage P use `cohort.size` in the singular. Faculty is a list.
 2. R5: the 15-minute setup buffer applies once per move (pool to activity). A move occupies `[move_start, move_start + units * move_minutes_per_unit + 15)` with `move_start >= plan_time` and an end at or before the activity's new start. Each move takes one mover; concurrent moves are capped at `staff_available`.
 3. Resolved: source-side contention is part of R4 (see section 3). The return trip takes the same time as the outbound move (`units x move_minutes_per_unit + 15`). It only keeps the units unavailable: it does not use a mover for R5's cap and adds nothing to stage K.
@@ -85,3 +86,4 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 - The baseline obeys the rules (including R6 travel). A scenario is only returned if cancelling every movable class is a valid plan.
 - `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
 - Known limit: joint finds no plan within the 10 s first stage for medium at load 90, so do not freeze that combination.
+- Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. `scenarios/frozen/` holds 24 of them so far (12 small, 12 medium).

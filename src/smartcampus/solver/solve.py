@@ -21,6 +21,8 @@ from smartcampus.solver.objective import StageValues, evaluate, stage_expression
 
 STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", "tie_break")
 
+MEDIUM_STAGE_SECONDS = (30.0, 30.0, 9.0, 9.0, 6.0, 6.0)
+
 
 @dataclass(frozen=True)
 class SolverSettings:
@@ -29,6 +31,12 @@ class SolverSettings:
     stage_seconds: tuple[float, float, float, float, float, float] = (10, 10, 3, 3, 2, 2)
     num_workers: int = 1
     random_seed: int = 42
+
+    @classmethod
+    def for_problem(cls, problem: RecoveryProblem) -> "SolverSettings":
+        """The time tier for the problem's size: small keeps the default, others get 3x (spec 5)."""
+        size = problem.provenance.size if problem.provenance else "small"
+        return cls() if size == "small" else cls(stage_seconds=MEDIUM_STAGE_SECONDS)
 
 
 class StageStatus(StrEnum):
