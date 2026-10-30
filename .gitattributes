@@ -1,0 +1,2 @@
+scenarios/frozen/*.json text eol=lf
+scenarios/candidates/**/*.json text eol=lf
