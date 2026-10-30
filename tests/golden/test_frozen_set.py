@@ -15,7 +15,7 @@ from smartcampus.generator.synth import GENERATOR_VERSION, generate_scenario
 
 FROZEN = Path(__file__).parents[2] / "scenarios" / "frozen"
 
-SIZES = ("small",)  # medium waits in scenarios/candidates/medium/ until joint solves all 12
+SIZES = ("small", "medium")
 LOADS = (50, 75)
 SEVERITIES = ("room", "building", "hold")
 SEEDS = (1, 2)

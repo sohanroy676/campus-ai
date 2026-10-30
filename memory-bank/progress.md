@@ -62,9 +62,15 @@
   - Greedy takes up to 437 s on medium because `validate()` runs the pairwise R6 `check` for each of its 205 steps (separate defect, not fixed)
   - 515 tests, `ruff`, `mypy src` pass; the full suite takes about 5.5 minutes
 
+- Medium time tier and faster greedy on `feature/medium-tier` (2 commits, not pushed) — 2026-10-30
+  - `SolverSettings.for_problem`: small 10/10/3/3/2/2 s, medium and large 30/30/9/9/6/6 s (spec section 5, ADR 0005). Joint returns a plan on all 12 medium scenarios; the 12 files moved to `scenarios/frozen/` (24 frozen)
+  - R6 `check` indexed by person and swept by start, same violations and order (golden test vs the old loop); greedy on `medium-l75-building-s1` 437 s to about 112 s (rest is the R2 and R1 checks)
+  - 543 tests pass (about 7 min); `ruff`, `mypy src` pass
+
 ## In progress
 
-- Medium is not frozen: two of 12 get no plan after two rounds of shrinking. Decision needed: a separate medium time tier in the spec, or leave medium out of the frozen set. Solver settings are unchanged (10/10/3/3/2/2).
+- Nothing open on this branch; waiting for approval to push.
+
 
 ## Next
 

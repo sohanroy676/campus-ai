@@ -4,7 +4,7 @@ Continue work on campus-ai (D:\Programming\campus-ai). CLAUDE.md and the memory-
 
 ## State
 - `main` holds the generator (PR #6) and, after this session's PR, the frozen small set, the smaller R4/R5/R6/objective models and the greedy start plan. Check `git log` and `gh pr list` to confirm what landed and that CI was green (`checks` and `secrets`). 515 tests.
-- `scenarios/frozen/` holds 12 small scenarios (never edit them). The 12 medium scenarios are candidates in `scenarios/candidates/medium/`, not frozen.
+- `scenarios/frozen/` holds 12 small scenarios (never edit them); medium was frozen on feature/medium-tier.
 - ADR-0004 has the numbers. Merged feature branches still exist; do not delete them.
 
 ## Open decision (ask the user first)

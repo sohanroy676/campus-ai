@@ -45,6 +45,7 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 
 ## 5. Solver
 - 30 s total limit, spread across the stages as 10 / 10 / 3 / 3 / 2 / 2 s. Each stage keeps the best solution it found.
+- Time tiers by scenario size (from `provenance.size`; a scenario without provenance counts as small): small keeps 30 s as above; medium and large get 90 s, split 30 / 30 / 9 / 9 / 6 / 6 s. Reason: on medium the presolve alone takes 2 to 5 s and a 10 s first stage often ends with no plan (ADR 0005). Callers can still pass explicit settings.
 - `num_workers = 1` and `random_seed = 42` for tests, evaluation and the demo.
 - Infeasibility: the model can always cancel, so a real "no solution" means bad input and is an error. For rejected-option explanations, each rule R1 to R8 sits behind an assumption literal and the conflicting rules are reported.
 

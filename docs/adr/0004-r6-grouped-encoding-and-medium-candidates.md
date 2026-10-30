@@ -70,4 +70,4 @@ Gate run on all 12 medium scenarios with the greedy plan as the start (greedy an
 
 Greedy profile (`medium-l75-room-s1`, 56 s under the profiler): greedy calls `validate()` on the whole timetable for each of its 205 candidate steps, and 80% of that is the pairwise loop in R6's `check` (38 million `shares_person` calls). Speeding up `check` by indexing placements per person, with the same output order, would remove most of it; it is a separate defect and is not fixed here. Greedy time is not part of the joint times above.
 
-Medium stays in `scenarios/candidates/medium/`. Open decision: a separate time tier for medium in the spec, or leave medium out of the frozen set.
+Medium stayed in `scenarios/candidates/medium/` until the time tier was decided; see ADR 0005. Greedy was later sped up (R6 `check` indexed by person and swept by start): 437 s to about 112 s on `medium-l75-building-s1`.
