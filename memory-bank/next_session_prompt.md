@@ -3,33 +3,30 @@
 Continue work on campus-ai (D:\Programming\campus-ai). CLAUDE.md and the memory-bank are loaded.
 
 ## State
-- `main` is d179f78 (CI green: `checks` and `secrets`). The work since then is on local branch `feature/frozen-grid`, pushed to `origin/feature/generator` (the branch this environment designates). No PR is open; do not open one or merge without approval. Check `git log` and `git status` first.
-- Frozen set: 270 of 405 (135 small, 135 medium: loads 50/75/90 x room/building/hold x seeds 1 to 15). 135 large are not frozen. 20 smoke instances are separate and not counted. Do not state any other target.
-- R1 and R2 `check` are indexed; greedy on the slowest medium went 321 s to 89.5 s. 801 tests pass (about 7 min).
-- All timing runs so far are in `docs/results/solver-timing-2026-10-30.md` and `.csv` (medium load 90: 6 of 6 plans; large with the medium tier: 7 of 9 plans, no plan on `large-l75-building-s1` and `large-l90-room-s1`, presolve about 15 s).
-- Merged feature branches still exist; do not delete them. Never edit `scenarios/frozen/`.
+- `main` is d179f78 (CI green: `checks` and `secrets`). The work since then is on local branch `feature/frozen-grid`. It was pushed to `origin/feature/generator` (the branch this environment designates) up to fe13523; the later commits (abfb433, dfc15db, 2177c64, bc5c265, c6e7ced, plus the docs commit) are local and NOT pushed. No PR is open; do not open one, push or merge without approval. Check `git log` and `git status` first.
+- Frozen set: all 405 (small, medium, large x loads 50/75/90 x room/building/hold x seeds 1 to 15), 20 smoke instances are separate and not counted. Never edit files in `scenarios/frozen/`.
+- Done this session: the 11 medium no-plans were a hint defect and are fixed (ADR 0006, `docs/results/medium-no-plan-diagnosis-2026-10-30.md`); large tier 60/60/18/18/12/12 s chosen from a pilot (`docs/results/large-tier-pilot-2026-10-30.csv`); baselines re-solve and sequential (spec section 9); eval harness, stats and report (`src/smartcampus/eval/`, spec section 10); `smartcampus eval` and `compare` work. 989 tests pass (about 8.5 min).
+- NOT done: the full evaluation run. Joint has not been run on the 135 large frozen scenarios, and the small and medium plans were found before the hint fix, so everything is re-run once in the evaluation.
 
 ## Open items, in order
-1. DONE, needs the user's decision. Joint ran on 240 of the 246 newly frozen scenarios (`docs/results/frozen-joint-check-2026-10-30.md`, commit b9f0c44): plan on 229, no plan on 11, all medium (load 75: building-s15, hold-s15, hold-s6, room-s13, room-s7; load 90: hold-s10, hold-s5, hold-s9, room-s10, room-s3, room-s8). Each ended after about 33 s (probably stage 1 found nothing in 30 s; not verified). Do not add a per-load tier. Apply the user's answer on how to fill the count (and whether to re-run one scenario with a solver log first, about 35 s). The scratch script was `check_joint.py` in the session scratchpad (not in the repo).
-2. Large time tier (needs the user's go-ahead): test 60/60/18/18/12/12 s on `large-l75-building-s1` and `large-l90-room-s1`, then seeds 2 and 3. If presolve is the cause, consider a model fix before a longer tier. Then write the tier into `SolverSettings.for_problem`, spec section 5 and an ADR, and freeze large seeds 1 to 15 (update `test_frozen_set.py`).
-3. Baselines in `baselines/`: sequential per-domain repair (rooms, then equipment, then timing; needs a short spec definition first) and re-solve from scratch. Re-solve is decided: a full joint solve ignoring the existing timetable, stages P, D, S dropped, C, K and T kept, no start-plan hint, same total budget as the scenario's tier with the freed time given to C and K; P, D, S are still computed on its plan. Add both to `Method` in `coordinator/run.py`.
-4. Eval harness and stats (Gate 2): `eval/metrics.py`, `harness.py`, `stats.py`; medians and IQR, win/tie/loss, paired Wilcoxon (scipy is a dependency), `num_workers=1`, seed 42; report greedy and joint time separately; wire `eval` and `compare` in the CLI.
-5. ITC 2019 loader: waits for the user's data files (`data/itc2019/`, gitignored). Ask the user.
-6. Repair-overrun loop and approval triggers (spec section 6), then contract-net.
-7. Optional: greedy still rebuilds `fixed_placements` and `placements` for every rule on every `validate` call (about 10% of its time).
+1. Ask the user when to run the full evaluation (405 instances x greedy, sequential, resolve, joint; expect many hours). Start it in the background: `uv run smartcampus eval scenarios/frozen/ --methods all --out results/ > var/eval.log 2>&1`, then Monitor `var/eval.log` (filter: `Traceback|Error|FAILED|Killed|run\(s\)`). It appends to `results/results.jsonl` and resumes if interrupted; do not run anything else timed at the same time. When done, copy `report.md` and a CSV into `docs/results/` (`results/` and `var/` are not for keeping) and write the reading: plan rate per method and per size, Wilcoxon on instances both solved, sensitivity view, remaining no-plans as a solver limit, threats to validity.
+2. ITC 2019 loader: waits for the user's data files (`data/itc2019/`, gitignored). Ask the user.
+3. Repair-overrun loop and approval triggers (spec section 6), then contract-net (add to `Method`, spec section 9, and the eval).
+4. Optional: greedy still rebuilds `fixed_placements` and `placements` for every rule on every `validate` call (about 10% of its time); R1/R2 `check` speed on large; hint completion takes a few seconds before stage 1 on medium and large (not in the stage budget).
 
 ## Environment (Windows)
 - `export PATH="$HOME/.local/bin:$PATH"` for uv. gh is at "C:\Program Files\GitHub CLI\gh.exe" (sohanroy676).
-- Write files as UTF-8 without BOM; in Python pass `encoding="utf-8"` and `newline=""` (docs and memory-bank files use CRLF in the working copy). Use the Write tool for long files.
-- Commit trailer: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Do not push or merge without approval. After a push, watch CI with Monitor (`gh run watch` / `gh pr checks`), report every terminal state including `secrets`, and do not report green unless seen.
+- Write files as UTF-8 without BOM. Docs and memory-bank files use CRLF in the working copy; in Python pass `encoding="utf-8"` and `newline=""`. Use the Write and Edit tools for long files; shell heredocs with backslashes mangle escapes (a `"\n"` became a real newline in `cli.py`).
+- Commit trailer: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. After a push, watch CI with Monitor (`gh run watch` / `gh pr checks`), report every terminal state including `secrets`, and do not report green unless seen.
 - A Monitor expires after 30 minutes at most; for long runs write to a log and watch the log. A background `nohup ... &` launcher reports "completed" at once; that is not the job finishing, so watch the log. Do not run two timed jobs at once (they share the CPU).
-- `var/` is gitignored: put summaries in `docs/results/`, not only in logs.
+- `var/` is gitignored. `time.monotonic()` has about 15 ms resolution on Windows, so very short timings read 0.
 - Chain commands with care: `a && b; git commit` still commits when `a` fails. Run lint before staging.
 
 ## Known facts that matter
-- `SolverSettings.for_problem(problem)` picks the tier from `provenance.size`; no provenance counts as small; large reuses the medium tier (30/30/9/9/6/6 s) until a large tier is measured.
-- The golden tests for the old R6, R4 and R5 encodings use only the original 24 scenarios (glob `*-l[57][05]-*-s[12].json`); the old encodings are too slow for all 270.
-- `DecisionVars` has shared literals (`any_happens`, `building_start_literals`, `start_literals`, `placed_literal`, `start_bounds`). They are "implied by" literals except `placed_literal`.
-- `stage_expression(ctx, i)` builds one stage; `stage_expressions(ctx)` returns all six (tests use it).
-- `room_closures(problem)` in `rules/_shared.py` lists per-room closed intervals for the R2 check; `is_closed` (used by `post`) still uses the scanning predicates.
-- Scratch scripts for the timing runs were in the session scratchpad (not in the repo): run `run_scenario` for JOINT with a patched `CpSolver` that logs "Starting search at" for presolve time; time `greedy` separately.
+- `SolverSettings.for_problem(problem)` picks the tier from `provenance.size`: small 10/10/3/3/2/2 s, medium 30/30/9/9/6/6 s, large 60/60/18/18/12/12 s; no provenance counts as small. `SolverSettings.skip_stages` leaves stages out (re-solve and the sequential passes use it).
+- `solve(problem, settings, hint=, restrict=)`: `hint` is completed by `_complete_hint` before stage 1; `restrict(ctx)` may fix or forbid decision variables only, never encode a rule.
+- `RunResult.planning_seconds` and `start_plan_seconds` (joint's greedy part) feed the eval's separate greedy and joint times.
+- The golden tests for the old R6, R4 and R5 encodings use only the original 24 scenarios (glob `*-l[57][05]-*-s[12].json`); the old encodings are too slow for all of them. `test_frozen_set.py` regenerates all 405 files byte for byte.
+- `DecisionVars` has shared literals (`any_happens`, `building_start_literals`, `start_literals`, `placed_literal`, `start_bounds`). `stage_expression(ctx, i)` builds one stage; `stage_expressions(ctx)` returns all six.
+- `large-l90-room-s102` (pilot seed, not frozen) ends with 1 cancellation on both tiers with every stage at its time limit; that cancellation is not proven necessary.
+- Scratch scripts for the timing runs were in the session scratchpad (not in the repo); `smartcampus eval --pattern` now does the same job on a subset (for example `--pattern "small-l75-*-s[12].json"`).

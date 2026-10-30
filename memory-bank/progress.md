@@ -81,14 +81,19 @@
   - Times: small greedy median 0.9 s (max 23.3), joint median 2.1 s (max 31.6); medium greedy median 2.8 s (max 184.7), joint median 23.0 s (max 95.9)
   - Each no-plan ended after 32.4 to 33.9 s (about the 30 s first stage plus build); cause not verified. No per-load tier added. Results in `docs/results/frozen-joint-check-2026-10-30.md` and `.csv`
 
+- Hint fix, large tier, baselines and eval harness on `feature/frozen-grid` (commits abfb433, dfc15db, 2177c64, bc5c265, c6e7ced; local, not pushed) — 2026-10-30
+  - Medium no-plans: the hint covered 63k of 88k variables, so CP-SAT found no first solution in 30 s; `_complete_hint` fixes it. All 11 former no-plans return a plan on the medium tier; the two large seed-1 failures too. `docs/results/medium-no-plan-diagnosis-2026-10-30.md`, ADR 0006
+  - Large tier 60/60/18/18/12/12 s (pilot on seeds 101 to 103 plus seed 1: plan on 5 of 5 on both tiers; the longer tier lowers people moved on 3 of 5). 135 large scenarios frozen: `scenarios/frozen/` = 405 files (47 MB of large JSON)
+  - Baselines: `baselines/resolve.py` (P, D, S dropped, freed time to C and K, no hint) and `baselines/sequential.py` (rooms, equipment, timing as restricted solves); `Method.RESOLVE`, `Method.SEQUENTIAL`; spec section 9
+  - Eval: `eval/metrics.py`, `harness.py`, `stats.py`, `report.py`; `smartcampus eval` (resumable `results.jsonl`, `report.md`) and `compare`; spec section 10. Smoke run on 6 small scenarios x 4 methods: plan on all 24
+  - 989 tests pass (about 8.5 min); `ruff`, `mypy src` pass
+
 ## In progress
 
-- Waiting for the user: how to fill the 405 given the 11 medium no-plans (and whether to re-run one with a solver log first).
-- Large time tier: proposed 60/60/18/18/12/12 s for large, to be tested on the two failing scenarios and seeds 2 and 3 (awaiting the user's go-ahead).
-
+- Waiting for the user: when to run the full evaluation (405 instances x greedy, sequential, resolve, joint). The harness is ready and resumable.
 
 ## Next
 
-- Confirm the other spec assumptions in `docs/model-spec.md` section 7.
-- Remaining ROADMAP "Now" item: officer and facilities interviews.
-- v0.3 to v0.5 (ROADMAP "Next"): ITC 2019 loader when the data files exist, repair-overrun re-planning loop (re-run `derive_recovery` on the state), approval triggers, sequential and re-solve baselines, eval harness and stats. Re-solve from scratch is decided: a full joint solve ignoring the timetable, stages P, D, S dropped, C, K, T kept, no hint, same total budget as the tier with the freed time given to C and K; P, D, S still computed on its plan.
+- Full evaluation run, results and stats into `docs/results/`; report plan rate per method and per size, the paired Wilcoxon on instances both solved, and the sensitivity view.
+- Officer and facilities interviews (ROADMAP "Now").
+- ITC 2019 loader when the data files exist; repair-overrun re-planning loop, approval triggers, contract-net (v0.3 to v0.5).
