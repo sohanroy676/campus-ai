@@ -67,13 +67,22 @@
   - R6 `check` indexed by person and swept by start, same violations and order (golden test vs the old loop); greedy on `medium-l75-building-s1` 437 s to about 112 s (rest is the R2 and R1 checks)
   - 543 tests pass (about 7 min); `ruff`, `mypy src` pass
 
+- Frozen grid, faster greedy and timing record on `feature/frozen-grid` (pushed to `origin/feature/generator`) — 2026-10-30
+  - Joint run on medium load 90 (6 scenarios) returned a plan on all 6, so load 90 stays in the 405; spec section 8 updated. No per-load tier
+  - `scenarios/frozen/` now 270 files: small and medium x loads 50/75/90 x room/building/hold x seeds 1 to 15 (135 each). `GENERATOR_VERSION` still "1"; the 24 earlier files are unchanged. `test_frozen_set.py` checks the grid and regenerates each byte for byte. The old-encoding golden tests (`test_r6_encoding`, `test_equipment_encoding`, `test_r6_check_index`) stay on the original 24 (12 small for the last)
+  - Joint has NOT been run on the 246 new frozen scenarios (small load 90, seeds 3 to 15 everywhere, medium load 90 seeds 3 to 15). Do that before the 405 runs; report any no-plan
+  - R1 and R2 `check` indexed (same violations, same order; `tests/golden/test_r1_r2_check_index.py`); greedy on `medium-l90-building-s1` 321 s to 89.5 s
+  - Large measured on 9 scenarios (seed 1) with the medium tier: plan on 7, no plan on `large-l75-building-s1` and `large-l90-room-s1` (presolve about 15 s). No large tier chosen, no large frozen
+  - All timings in `docs/results/solver-timing-2026-10-30.md` and `.csv`
+  - 801 tests pass (about 7 min); `ruff`, `mypy src` pass
+
 ## In progress
 
-- Nothing open on this branch; waiting for approval to push.
+- Large time tier: proposed 60/60/18/18/12/12 s for large, to be tested on the two failing scenarios and seeds 2 and 3 (awaiting the user's go-ahead).
 
 
 ## Next
 
 - Confirm the other spec assumptions in `docs/model-spec.md` section 7.
 - Remaining ROADMAP "Now" item: officer and facilities interviews.
-- v0.3 to v0.5 (ROADMAP "Next"): seeded generator (synthetic first, ITC 2019 loader when the data files exist), repair-overrun re-planning loop (re-run `derive_recovery` on the state), approval triggers, sequential and re-solve baselines.
+- v0.3 to v0.5 (ROADMAP "Next"): ITC 2019 loader when the data files exist, repair-overrun re-planning loop (re-run `derive_recovery` on the state), approval triggers, sequential and re-solve baselines, eval harness and stats. Re-solve from scratch is decided: a full joint solve ignoring the timetable, stages P, D, S dropped, C, K, T kept, no hint, same total budget as the tier with the freed time given to C and K; P, D, S still computed on its plan.

@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-Work is on `feature/medium-tier` (from `main` c253f43 after PR #7, which merged the frozen small set, smaller models and greedy start plan). Done: medium time tier (ADR 0005), medium frozen (24 scenarios), greedy R6 check indexed. Not pushed. Frozen set = the 12 small scenarios; the 12 medium files are candidates in `scenarios/candidates/medium/`, frozen later only if joint returns a plan on all 12. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end.
+Work is on `feature/frozen-grid` (from `main` d179f78), pushed to `origin/feature/generator` (the designated branch for this environment; no PR opened). Done: 270 of 405 frozen (135 small, 135 medium; loads 50/75/90, seeds 1 to 15), R1 and R2 `check` indexed (greedy 3.6x faster on the slowest medium), timing record in `docs/results/solver-timing-2026-10-30.md`. Open: (1) joint has not been run on the 246 newly frozen scenarios; (2) large has no time tier: on 9 large scenarios with the medium tier joint gave a plan on 7 and none on `large-l75-building-s1` and `large-l90-room-s1` (presolve about 15 s), proposed 60/60/18/18/12/12 s, awaiting the user's go-ahead; nothing large is frozen. Merged feature branches still exist; do not delete them. Gate 1 is reached: `smartcampus run <scenario> --method joint|greedy` works end to end. CI on `main` d179f78 was green (`checks`, `secrets`).
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.

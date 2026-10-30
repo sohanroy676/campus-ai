@@ -1,0 +1,16 @@
+scenario,size,load,severity,seed,classes,tier_s,outcome,greedy_s,presolve_s,wall_s,cancellations,people_moved,delay,cost,start_shift,tie_break,greedy_timed
+medium-l90-room-s1,medium,90,room,1,759,90,plan,4.8,2.3,36.7,0,59,60,0,60,1052,before_r1_r2_index
+medium-l90-room-s2,medium,90,room,2,764,90,plan,7.9,0.9,17.6,0,151,0,0,60,3089,before_r1_r2_index
+medium-l90-building-s1,medium,90,building,1,770,90,plan,321.3,1.8,403.4,1,2743,4020,35,6960,31480,before_r1_r2_index
+medium-l90-building-s2,medium,90,building,2,768,90,plan,366.7,3.3,460.3,14,2799,2670,110,6960,43623,before_r1_r2_index
+medium-l90-hold-s1,medium,90,hold,1,782,90,plan,128.9,4.5,224.4,1,1926,360,0,360,7579,before_r1_r2_index
+medium-l90-hold-s2,medium,90,hold,2,770,90,plan,8.7,0.9,18.1,0,79,30,0,60,2024,before_r1_r2_index
+large-l50-room-s1,large,50,room,1,800,90,plan,0.8,1.6,14.5,0,43,0,0,0,25,after_r1_r2_index
+large-l50-building-s1,large,50,building,1,806,90,plan,6.0,7.3,73.1,0,333,0,0,30,16145,after_r1_r2_index
+large-l50-hold-s1,large,50,hold,1,809,90,plan,1.5,1.9,18.0,0,46,0,0,0,1044,after_r1_r2_index
+large-l75-room-s1,large,75,room,1,1232,90,plan,5.6,2.2,23.0,0,39,0,0,60,2052,after_r1_r2_index
+large-l75-building-s1,large,75,building,1,1223,90,no_plan,42.1,15.3,79.3,,,,,,,after_r1_r2_index
+large-l75-hold-s1,large,75,hold,1,1255,90,plan,1.5,1.9,14.3,0,0,0,20,0,0,after_r1_r2_index
+large-l90-room-s1,large,90,room,1,1443,90,no_plan,49.0,15.5,88.9,,,,,,,after_r1_r2_index
+large-l90-building-s1,large,90,building,1,1441,90,plan,30.7,2.0,90.1,0,251,0,0,300,5162,after_r1_r2_index
+large-l90-hold-s1,large,90,hold,1,1444,90,plan,3.9,1.7,20.3,0,0,0,45,0,0,after_r1_r2_index
