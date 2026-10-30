@@ -76,8 +76,14 @@
   - All timings in `docs/results/solver-timing-2026-10-30.md` and `.csv`
   - 801 tests pass (about 7 min); `ruff`, `mypy src` pass
 
+- Joint check on the newly frozen scenarios (commit b9f0c44) — 2026-10-30
+  - 240 scenarios (the 246 minus 6 medium load 90 seed 1 and 2 timed earlier), greedy then joint, one job at a time, `num_workers=1`, seed 42, with the greedy hint. Plan on 229, no plan on 11, all medium (5 at load 75, 6 at load 90; 5 hold, 5 room, 1 building); small had none
+  - Times: small greedy median 0.9 s (max 23.3), joint median 2.1 s (max 31.6); medium greedy median 2.8 s (max 184.7), joint median 23.0 s (max 95.9)
+  - Each no-plan ended after 32.4 to 33.9 s (about the 30 s first stage plus build); cause not verified. No per-load tier added. Results in `docs/results/frozen-joint-check-2026-10-30.md` and `.csv`
+
 ## In progress
 
+- Waiting for the user: how to fill the 405 given the 11 medium no-plans (and whether to re-run one with a solver log first).
 - Large time tier: proposed 60/60/18/18/12/12 s for large, to be tested on the two failing scenarios and seeds 2 and 3 (awaiting the user's go-ahead).
 
 
