@@ -64,9 +64,8 @@ def post(ctx: DecisionVars) -> None:
         model.add(end == start + length)  # a definition; the rule's limits are enforced below
         model.add(start >= problem.plan_time_min).only_enforce_if([moved, lit])
         model.add(end <= WEEK_END_MIN).only_enforce_if([moved, lit])
-        for option in ctx.options[activity_id]:
-            if option.var is not None:
-                model.add(end <= option.start).only_enforce_if([option.var, moved, lit])
+        earliest, _ = ctx.start_bounds(activity_id)
+        model.add(end <= earliest).only_enforce_if([moved, lit])  # before every chosen start
         intervals.append(
             model.new_optional_interval_var(
                 start, length, end, ctx.and_literal(moved, lit), f"move_{activity_id}_{pool_id}"

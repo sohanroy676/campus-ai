@@ -141,24 +141,35 @@ def _contention_violations(problem: RecoveryProblem, plan: Plan) -> list[Violati
 def post(ctx: DecisionVars) -> None:
     lit = ctx.rule_lit[RuleId.R4]
     pools = ctx.problem.campus.pools
+    barred: list[cp_model.IntVar] = []  # placements R4 never allows
+    fixed_barred = False  # a fixed placement R4 does not allow
+    # Placements that need moved units, grouped by (class, room, type, units missing).
+    short: dict[tuple[str, str, str, int], list[Placement]] = defaultdict(list)
     for option in ctx.all_options():
-        if has_wrong_type(option):
-            ctx.forbid(option, RuleId.R4)
+        blocked = has_wrong_type(option)
         for eq_type, missing in remaining_equipment_need(ctx.problem, option).items():
-            if option.var is None:
-                ctx.forbid(option, RuleId.R4)  # unaffected activities cannot get moved units
-                continue
-            moved_in = [
-                ctx.units[(option.activity.id, p.id)]
-                for p in pools
-                if counts_as_moved_in(p, eq_type, option.room.id)
-            ]
-            if moved_in:
-                ctx.model.add(cp_model.LinearExpr.sum(moved_in) >= missing).only_enforce_if(
-                    [option.var, lit]
-                )
+            # Unaffected activities cannot get moved units.
+            if option.var is None or not any(
+                counts_as_moved_in(p, eq_type, option.room.id) for p in pools
+            ):
+                blocked = True
             else:
-                ctx.forbid(option, RuleId.R4)
+                short[option.activity.id, option.room.id, eq_type, missing].append(option)
+        if blocked and option.var is None:
+            fixed_barred = True
+        elif blocked and option.var is not None:
+            barred.append(option.var)
+    if fixed_barred:
+        ctx.model.add_bool_or([lit.negated()])
+    if barred:
+        ctx.model.add(cp_model.LinearExpr.sum(barred) == 0).only_enforce_if(lit)
+    for (activity_id, room_id, eq_type, missing), group in short.items():
+        happens = ctx.any_happens(("short", activity_id, room_id, eq_type, missing), group)
+        moved_in = [
+            ctx.units[(activity_id, p.id)] for p in pools if counts_as_moved_in(p, eq_type, room_id)
+        ]
+        assert happens is not None  # every member has a variable
+        ctx.model.add(cp_model.LinearExpr.sum(moved_in) >= missing).only_enforce_if([happens, lit])
     for (_, pool_id), units in ctx.units.items():
         if not ctx.problem.campus.pool(pool_id).movable:
             ctx.model.add(units == 0).only_enforce_if(lit)
@@ -190,14 +201,15 @@ def _post_contention(ctx: DecisionVars) -> None:
             if (pool.room_id, pool.type) != (room_id, eq_type):
                 continue
             moved, start = ctx.moved[key], ctx.move_start[key]
-            placed = [o.var for o in ctx.options[key[0]] if o.var is not None]
-            model.add_bool_or([*placed, moved.negated()]).only_enforce_if(lit)
+            placed = ctx.placed_literal(key[0])
+            if placed is not None:
+                model.add_bool_or([placed, moved.negated()]).only_enforce_if(lit)
             back = model.new_int_var(0, horizon, f"back_{key[0]}_{key[1]}")
-            for option in ctx.options[key[0]]:
-                if option.var is not None:
-                    model.add(back == option.end + return_minutes(pool, units)).only_enforce_if(
-                        [option.var, moved, lit]
-                    )
+            # back = class end + return trip, for every chosen start: between earliest and latest
+            earliest, latest = ctx.start_bounds(key[0])
+            trip = problem.activity(key[0]).duration_min + return_minutes(pool, units)
+            model.add(back >= latest + trip).only_enforce_if([moved, lit])
+            model.add(back <= earliest + trip).only_enforce_if([moved, lit])
             until = model.new_int_var(0, horizon, f"until_{key[0]}_{key[1]}")
             model.add_max_equality(until, [start, back])  # never earlier than the move start
             length = model.new_int_var(0, horizon, f"lent_{key[0]}_{key[1]}")

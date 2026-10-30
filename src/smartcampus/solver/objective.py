@@ -5,6 +5,7 @@ Per-placement costs are plain functions used twice: `evaluate` scores a finished
 """
 
 from collections import defaultdict
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
@@ -12,7 +13,7 @@ from ortools.sat.python import cp_model
 from smartcampus.domain.entities import Activity, EquipmentPool
 from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
-from smartcampus.rules._shared import known_moves, move_minutes, plan_placements
+from smartcampus.rules._shared import Placement, known_moves, move_minutes, plan_placements
 from smartcampus.rules.variables import DecisionVars
 
 REPEAT_MOVE_PENALTY = 50
@@ -131,26 +132,40 @@ def _weighted(terms: list[tuple[int, cp_model.IntVar]]) -> cp_model.LinearExprT:
 
 def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
     """The six stage expressions, in solving order, over the decision variables of `ctx`."""
+    return [stage_expression(ctx, stage) for stage in range(len(_BUILDERS))]
+
+
+def stage_expression(ctx: DecisionVars, stage: int) -> cp_model.LinearExprT:
+    """One stage's expression (0 = C ... 5 = T). Only this stage's helper variables are added.
+
+    The solver builds each stage just before minimizing it, so an earlier stage is not slowed down
+    by the helper variables of later ones.
+    """
+    return _BUILDERS[stage](ctx)
+
+
+def _affected_options(ctx: DecisionVars) -> Iterator[tuple[Activity, Placement]]:
+    for activity in ctx.problem.activities:
+        if activity.id in ctx.problem.movable_activity_ids:
+            for option in ctx.options[activity.id]:
+                if option.var is not None:
+                    yield activity, option
+
+
+def _cancellations(ctx: DecisionVars) -> cp_model.LinearExprT:
+    return cp_model.LinearExpr.sum(list(ctx.cancelled.values()))
+
+
+def _people(ctx: DecisionVars) -> cp_model.LinearExprT:
     problem, model = ctx.problem, ctx.model
-    affected = [a for a in problem.activities if a.id in problem.movable_activity_ids]
-
     people: list[tuple[int, cp_model.IntVar]] = []
-    delay: list[tuple[int, cp_model.IntVar]] = []
-    start_shift: list[tuple[int, cp_model.IntVar]] = []
-    tie_break: list[tuple[int, cp_model.IntVar]] = []
     changed_by_cohort: dict[str, list[cp_model.IntVar]] = defaultdict(list)
-    for activity in affected:
-        for option in ctx.options[activity.id]:
-            if option.var is None:
-                continue
-            room_id, start = option.room.id, option.start
-            people.append((people_cost(problem, activity, room_id, start), option.var))
-            delay.append((delay_minutes(activity, start), option.var))
-            start_shift.append((shift_minutes(activity, start), option.var))
-            tie_break.append((tie_break_cost(problem, activity, room_id, start), option.var))
-            if is_changed(activity, room_id, start):
-                changed_by_cohort[activity.cohort_id].append(option.var)
-
+    for activity, option in _affected_options(ctx):
+        assert option.var is not None
+        room_id, start = option.room.id, option.start
+        people.append((people_cost(problem, activity, room_id, start), option.var))
+        if is_changed(activity, room_id, start):
+            changed_by_cohort[activity.cohort_id].append(option.var)
     for cohort_id, changed in changed_by_cohort.items():
         if problem.prior_moves_this_week.get(cohort_id, 0) >= 1:
             people.extend((REPEAT_MOVE_PENALTY, var) for var in changed)
@@ -158,7 +173,21 @@ def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
             extra = model.new_int_var(0, len(changed), f"repeats_{cohort_id}")
             model.add_max_equality(extra, [0, cp_model.LinearExpr.sum(changed) - 1])
             people.append((REPEAT_MOVE_PENALTY, extra))
+    return _weighted(people)
 
+
+def _delay(ctx: DecisionVars) -> cp_model.LinearExprT:
+    return _weighted(
+        [
+            (delay_minutes(activity, option.start), option.var)
+            for activity, option in _affected_options(ctx)
+            if option.var is not None
+        ]
+    )
+
+
+def _cost(ctx: DecisionVars) -> cp_model.LinearExprT:
+    problem, model = ctx.problem, ctx.model
     cost: list[tuple[int, cp_model.IntVar]] = []
     for (activity_id, pool_id), units in ctx.units.items():
         pool = problem.campus.pool(pool_id)
@@ -178,12 +207,27 @@ def stage_expressions(ctx: DecisionVars) -> list[cp_model.LinearExprT]:
             lands_far = model.new_bool_var(f"far_{activity_id}_{pool_id}")
             model.add_max_equality(lands_far, far)
             cost.append((CROSS_BUILDING_MOVE_COST, ctx.and_literal(moved, lands_far)))
+    return _weighted(cost)
 
-    return [
-        cp_model.LinearExpr.sum(list(ctx.cancelled.values())),
-        _weighted(people),
-        _weighted(delay),
-        _weighted(cost),
-        _weighted(start_shift),
-        _weighted(tie_break),
-    ]
+
+def _start_shift(ctx: DecisionVars) -> cp_model.LinearExprT:
+    return _weighted(
+        [
+            (shift_minutes(activity, option.start), option.var)
+            for activity, option in _affected_options(ctx)
+            if option.var is not None
+        ]
+    )
+
+
+def _tie_break(ctx: DecisionVars) -> cp_model.LinearExprT:
+    return _weighted(
+        [
+            (tie_break_cost(ctx.problem, activity, option.room.id, option.start), option.var)
+            for activity, option in _affected_options(ctx)
+            if option.var is not None
+        ]
+    )
+
+
+_BUILDERS = (_cancellations, _people, _delay, _cost, _start_shift, _tie_break)
