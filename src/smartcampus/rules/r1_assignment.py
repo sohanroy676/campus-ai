@@ -31,6 +31,7 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
             )
         )
     rooms = {r.id for r in problem.campus.rooms}
+    starts_by_duration: dict[int, frozenset[int]] = {}  # valid starts depend on length only
     for asg in plan.assignments:
         if asg.activity_id not in movable:
             continue
@@ -40,7 +41,11 @@ def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
                     RuleId.R1, f"unknown room {asg.room_id}", (asg.activity_id,), (asg.room_id,)
                 )
             )
-        elif asg.start_min not in valid_starts(problem, problem.activity(asg.activity_id)):
+            continue
+        activity = problem.activity(asg.activity_id)
+        if activity.duration_min not in starts_by_duration:
+            starts_by_duration[activity.duration_min] = frozenset(valid_starts(problem, activity))
+        if asg.start_min not in starts_by_duration[activity.duration_min]:
             out.append(
                 Violation(
                     RuleId.R1,

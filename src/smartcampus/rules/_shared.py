@@ -103,6 +103,21 @@ def room_hold_overlaps(problem: RecoveryProblem, room_id: str, start: int, end: 
     )
 
 
+def room_closures(problem: RecoveryProblem) -> dict[str, list[tuple[int, int]]]:
+    """Per room, the [start, end) minutes in which a fault or a room hold closes it.
+
+    A placement hits `room_fault_overlaps` or `room_hold_overlaps` exactly when it overlaps one of
+    its room's closures; this lists them once so a check does not scan every fault per placement.
+    """
+    closures: dict[str, list[tuple[int, int]]] = defaultdict(list)
+    for f in problem.faults:
+        closures[f.room_id].append((f.interval.start, f.interval.end))
+    for h in problem.holds:
+        if h.target_kind == "room":
+            closures[h.target_id].append((h.interval.start, h.interval.end))
+    return closures
+
+
 def pool_hold_overlaps(problem: RecoveryProblem, pool_id: str, start: int, end: int) -> bool:
     return any(
         h.target_kind == "equipment"
