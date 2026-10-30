@@ -1,0 +1,11 @@
+tier,scenario,result,seconds,C,P,D,K,S,T,stages
+medium,large-l75-building-s1,plan,147.2,0,2070,120,25,480,35962,
+medium,large-l90-room-s1,plan,158.9,0,2041,150,0,570,14301,
+medium,large-l75-building-s101,plan,123.9,0,353,240,40,720,11255,o/o/t/t/t/t
+medium,large-l90-room-s102,plan,171.3,1,402,120,0,180,6432,t/t/t/t/t/t
+medium,large-l75-hold-s103,plan,99.2,0,0,0,90,0,0,o/o/o/o/o/o
+large,large-l75-building-s1,plan,238.0,0,1499,1560,45,3120,40885,
+large,large-l90-room-s1,plan,235.6,0,1570,1980,0,3300,26082,
+large,large-l75-building-s101,plan,152.8,0,353,210,40,690,11248,
+large,large-l90-room-s102,plan,261.2,1,384,390,0,450,7386,
+large,large-l75-hold-s103,plan,99.7,0,0,0,90,0,0,

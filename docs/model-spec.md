@@ -45,7 +45,7 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 
 ## 5. Solver
 - 30 s total limit, spread across the stages as 10 / 10 / 3 / 3 / 2 / 2 s. Each stage keeps the best solution it found.
-- Time tiers by scenario size (from `provenance.size`; a scenario without provenance counts as small): small keeps 30 s as above; medium and large get 90 s, split 30 / 30 / 9 / 9 / 6 / 6 s. Reason: on medium the presolve alone takes 2 to 5 s and a 10 s first stage often ends with no plan (ADR 0005). Callers can still pass explicit settings.
+- Time tiers by scenario size (from `provenance.size`; a scenario without provenance counts as small): small keeps 30 s as above; medium gets 90 s, split 30 / 30 / 9 / 9 / 6 / 6 s; large gets 180 s, split 60 / 60 / 18 / 18 / 12 / 12 s. Reason: on medium the presolve alone takes 2 to 5 s and a 10 s first stage often ends with no plan (ADR 0005); on large the longer tier lowers people moved on the scenarios where the medium budget ran out (ADR 0006). The start-plan hint covers every model variable (ADR 0006). Callers can still pass explicit settings.
 - `num_workers = 1` and `random_seed = 42` for tests, evaluation and the demo.
 - Infeasibility: the model can always cancel, so a real "no solution" means bad input and is an error. For rejected-option explanations, each rule R1 to R8 sits behind an assumption literal and the conflicting rules are reported.
 
@@ -86,4 +86,4 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 - The baseline obeys the rules (including R6 travel). A scenario is only returned if cancelling every movable class is a valid plan.
 - `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
 - Medium at load 90 (checked 2026-10-30 with the medium tier of section 5, seeds 1 and 2, room/building/hold): joint returns a plan on all 6, so the combination stays in the frozen set. Greedy start plan 5 to 367 s, first-stage presolve 0.9 to 4.5 s, total 18 to 460 s per scenario.
-- Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. The grid is 3 sizes x loads 50, 75, 90 x severities room, building, hold x seeds 1 to 15 = 135 per size. `scenarios/frozen/` holds 270 of them so far (135 small, 135 medium); large waits for a measured time tier. Timing runs: `docs/results/solver-timing-2026-10-30.md`.
+- Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. The grid is 3 sizes x loads 50, 75, 90 x severities room, building, hold x seeds 1 to 15 = 135 per size. `scenarios/frozen/` holds all 405 (135 per size); large was frozen once its time tier was piloted (ADR 0006). Timing runs: `docs/results/solver-timing-2026-10-30.md`.

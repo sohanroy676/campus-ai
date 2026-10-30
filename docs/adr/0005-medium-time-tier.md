@@ -15,5 +15,5 @@ All 12 return a plan. Wall time per scenario (greedy start plan included): 7 to 
 
 ## Consequences
 - Joint times on small and medium are not comparable: report them per tier.
-- Large has no measured tier; it reuses the medium budget until it is tested.
+- Large reused the medium budget when this was written; it has its own tier now (ADR 0006).
 - The frozen set is now 24 scenarios; `tests/golden/test_frozen_set.py` regenerates each byte for byte.

@@ -22,6 +22,7 @@ from smartcampus.solver.objective import StageValues, evaluate, stage_expression
 STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", "tie_break")
 
 MEDIUM_STAGE_SECONDS = (30.0, 30.0, 9.0, 9.0, 6.0, 6.0)
+LARGE_STAGE_SECONDS = (60.0, 60.0, 18.0, 18.0, 12.0, 12.0)
 
 # Longest the hint completion may take; it runs before stage 1 and is not part of the stage budget.
 HINT_COMPLETION_SECONDS = 10.0
@@ -37,8 +38,10 @@ class SolverSettings:
 
     @classmethod
     def for_problem(cls, problem: RecoveryProblem) -> "SolverSettings":
-        """The time tier for the problem's size: small keeps the default, others get 3x (spec 5)."""
+        """The time tier for the problem's size: small 30 s, medium 90 s, large 180 s (spec 5)."""
         size = problem.provenance.size if problem.provenance else "small"
+        if size == "large":
+            return cls(stage_seconds=LARGE_STAGE_SECONDS)
         return cls() if size == "small" else cls(stage_seconds=MEDIUM_STAGE_SECONDS)
 
 
