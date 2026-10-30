@@ -23,6 +23,8 @@ THREATS = (
     "p-values are descriptive. Differences of zero are dropped by the test.",
     "A method without a plan is a solver limit, not a property of the instance; the sensitivity "
     "view scores it as the cancel-everything plan and counts it as a loss.",
+    "Contract-net stops at a wall-clock limit (the size tier's total solver seconds) and keeps the "
+    "awards made so far, so on large instances its result depends on CPU speed.",
 )
 
 
@@ -89,6 +91,26 @@ def format_section(records: Sequence[RunRecord], title: str) -> list[str]:
     return lines
 
 
+def _provenance_lines(records: Sequence[RunRecord]) -> list[str]:
+    """Which code, generator version and solver tiers produced the records (when stamped)."""
+    commits = sorted({r.commit for r in records if r.commit})
+    generators = sorted({r.generator_version for r in records if r.generator_version})
+    unstamped = sum(1 for r in records if not r.commit)
+    if not commits and not generators:
+        return []
+    lines = [
+        f"Code: {', '.join(c[:12] + ('+dirty' if c.endswith('+dirty') else '') for c in commits)}"
+        f"; generator version: {', '.join(generators) or 'n/a'}; "
+        f"workers and seed per run are in results.jsonl.",
+    ]
+    if len(commits) > 1 or unstamped:
+        lines.append(
+            f"WARNING: records come from {len(commits)} code version(s) and {unstamped} run(s) "
+            "carry no commit; do not report these as one evaluation."
+        )
+    return [*lines, ""]
+
+
 def format_report(records: Sequence[RunRecord]) -> str:
     lines = [
         "# Evaluation report",
@@ -96,6 +118,7 @@ def format_report(records: Sequence[RunRecord]) -> str:
         f"{len({r.instance for r in records})} instances, "
         f"{len(records)} runs. Lower is better on every metric.",
         "",
+        *_provenance_lines(records),
     ]
     lines += format_section(records, "All instances")
     for size in ("small", "medium", "large"):

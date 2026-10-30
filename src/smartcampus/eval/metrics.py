@@ -1,7 +1,7 @@
 """One evaluation record per (instance, method), stored as one JSON line."""
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from smartcampus.domain.plan import Plan
@@ -27,6 +27,12 @@ class RunRecord:
     seconds: float  # wall time to build the plan, start plan included
     start_plan_seconds: float  # of which the greedy start plan (joint only, else 0)
     reason: str = ""  # why there is no plan
+    # What is needed to trace a record to its code and repeat it (empty in older records):
+    commit: str = ""  # git commit of the code, "+dirty" if the working tree differed
+    generator_version: str = ""  # of the scenario, from its provenance
+    stage_seconds: list[float] = field(default_factory=list)  # solver tier; empty for greedy
+    num_workers: int = 0  # 0 for methods without solver settings
+    random_seed: int = 0
 
     @property
     def solved(self) -> bool:
