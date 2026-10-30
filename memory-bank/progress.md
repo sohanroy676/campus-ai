@@ -94,9 +94,15 @@
   - CLI `smartcampus cascade <scenario> --followups <file> [--auto-approve/--no-auto-approve]`; demo `scenarios/dev/ac-cascade.json` (the AC demo plus `robotics-lab`) and `ac-cascade-overrun.json`; saved output `docs/results/cascade-demo-2026-10-30.txt`
   - Tests: `tests/unit/test_approval.py`, `test_loop.py`
 
+- Contract-net on `feature/recovery-loop` (local, not pushed) - 2026-10-30
+  - Spec section 9 (user chose: re-auction with strict whole-plan improvement, 5 rounds plus the tier's wall-clock limit, initial order by original start). `agents/equipment.py` (`propose_moves`, moved out of greedy), `agents/resource.py` (`Bid`, `bid_cost`, `RoomAgent`), `agents/contract_net.py` (`contract_net`); `Method.CONTRACT_NET` ("contract_net"), in the CLI and the eval report order
+  - Extension to the shown definition: a class with no bid may ask the few awarded classes the validator names most often to step aside (displacement), because plain re-bidding cannot rescue a cancelled class; classes without an award go first in each round
+  - Initial auction equals greedy (same order, same costs), so the result is never worse than greedy unless the limit ends the auction early. Seen: small load 90 hold seed 2 cancellations 2 to 1; `small-l75-building-s1` P 2249 to 2101 but still 5 cancellations (joint 2), 30 s limit used
+  - `tests/unit/test_contract_net.py`
+
 ## In progress
 
-- Next feature: contract-net (short spec section first, show the user). The full evaluation waits until every feature is built (ADR 0007).
+- Next: stamp eval records with commit, settings and generator version; then the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).
 
 ## Next
 
