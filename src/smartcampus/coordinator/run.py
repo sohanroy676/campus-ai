@@ -47,6 +47,50 @@ def seed_disruptions(store: EventStore, problem: RecoveryProblem) -> None:
         store.append(SafetyHoldPlaced(version=store.version, at_min=at_min, hold=hold))
 
 
+@dataclass(frozen=True)
+class Planned:
+    plan: Plan
+    stages: tuple[StageReport, ...]
+    settings: SolverSettings | None
+    planning_seconds: float
+    start_plan_seconds: float
+
+
+def plan_with_method(
+    current: RecoveryProblem,
+    method: Method,
+    version: int,
+    settings: SolverSettings | None = None,
+) -> Planned:
+    """Build and independently re-check a plan for `current`; nothing is written to the log."""
+    started = time.monotonic()
+    start_plan_seconds = 0.0
+    stages: tuple[StageReport, ...] = ()
+    used_settings: SolverSettings | None = None
+    if method is Method.JOINT:
+        used_settings = settings or SolverSettings.for_problem(current)
+        # The greedy plan is complete, so the search starts from a plan instead of from nothing.
+        start = greedy(current, based_on_version=version)
+        start_plan_seconds = time.monotonic() - started
+        solved = solve(current, used_settings, based_on_version=version, hint=start)
+        plan, stages = solved.plan, solved.stages
+    elif method is Method.RESOLVE:
+        tier = settings or SolverSettings.for_problem(current)
+        used_settings = resolve_settings(tier)
+        solved = resolve_from_scratch(current, tier, based_on_version=version)
+        plan, stages = solved.plan, solved.stages
+    elif method is Method.SEQUENTIAL:
+        used_settings = settings or SolverSettings.for_problem(current)
+        solved = sequential(current, used_settings, based_on_version=version)
+        plan, stages = solved.plan, solved.stages
+    else:
+        plan = greedy(current, based_on_version=version)
+
+    planning_seconds = time.monotonic() - started
+    assert_valid(current, plan)  # independent re-check with the shared rule library
+    return Planned(plan, stages, used_settings, planning_seconds, start_plan_seconds)
+
+
 def run_scenario(
     problem: RecoveryProblem,
     method: Method,
@@ -61,33 +105,8 @@ def run_scenario(
     base = RecoveryProblem.model_validate({**dict(problem), "faults": (), "holds": ()})
     seed_disruptions(store, problem)
     current = store.state.problem(base)
-    version = store.version
-
-    started = time.monotonic()
-    start_plan_seconds = 0.0
-    stages: tuple[StageReport, ...] = ()
-    used_settings: SolverSettings | None = None
-    if method is Method.JOINT:
-        used_settings = settings or SolverSettings.for_problem(problem)
-        # The greedy plan is complete, so the search starts from a plan instead of from nothing.
-        start = greedy(current, based_on_version=version)
-        start_plan_seconds = time.monotonic() - started
-        solved = solve(current, used_settings, based_on_version=version, hint=start)
-        plan, stages = solved.plan, solved.stages
-    elif method is Method.RESOLVE:
-        tier = settings or SolverSettings.for_problem(problem)
-        used_settings = resolve_settings(tier)
-        solved = resolve_from_scratch(current, tier, based_on_version=version)
-        plan, stages = solved.plan, solved.stages
-    elif method is Method.SEQUENTIAL:
-        used_settings = settings or SolverSettings.for_problem(problem)
-        solved = sequential(current, used_settings, based_on_version=version)
-        plan, stages = solved.plan, solved.stages
-    else:
-        plan = greedy(current, based_on_version=version)
-
-    planning_seconds = time.monotonic() - started
-    assert_valid(current, plan)  # independent re-check with the shared rule library
+    planned = plan_with_method(current, method, store.version, settings)
+    plan = planned.plan
     store.append(PlanApplied(version=store.version, at_min=current.plan_time_min, plan=plan))
     [applied] = store.state.applied_plans
     return RunResult(
@@ -95,9 +114,9 @@ def run_scenario(
         problem=current,
         plan=applied,
         values=evaluate(current, plan),
-        stages=stages,
-        settings=used_settings,
+        stages=planned.stages,
+        settings=planned.settings,
         log_version=store.version,
-        planning_seconds=planning_seconds,
-        start_plan_seconds=start_plan_seconds,
+        planning_seconds=planned.planning_seconds,
+        start_plan_seconds=planned.start_plan_seconds,
     )

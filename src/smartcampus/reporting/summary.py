@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from smartcampus.coordinator.loop import Round
 from smartcampus.coordinator.run import RunResult
 from smartcampus.domain.time import MINUTES_PER_DAY
 
@@ -61,6 +62,48 @@ def format_summary(result: RunResult, scenario: Path, db: Path) -> str:
         "Hard rules R1-R8: all satisfied (independent re-check)",
         f"Event log: {result.log_version} event(s) in {db}",
     ]
+    return "\n".join(lines)
+
+
+def format_cascade(rounds: list[Round], scenario: Path, followups: Path | None, db: Path) -> str:
+    """One block per round: what changed, which approval triggers fired, who approved."""
+    lines = [f"Scenario:   {scenario}", f"Follow-ups: {followups or 'none'}"]
+    for number, rnd in enumerate(rounds, start=1):
+        problem, plan = rnd.problem, rnd.plan
+        placed = {a.activity_id: a for a in plan.assignments}
+        window = problem.window
+        lines.append(
+            f"Round {number} at {format_minute(problem.plan_time_min)}: "
+            f"{len(problem.faults)} fault(s), {len(problem.holds)} hold(s); recovery window "
+            f"{format_minute(window.start)} to {format_minute(window.end)}; "
+            f"{len(problem.movable_activity_ids)} class(es) to recover"
+        )
+        for activity in sorted(
+            (problem.activity(a) for a in problem.movable_activity_ids), key=lambda a: a.id
+        ):
+            before = f"{activity.room_id} {format_minute(activity.start_min)}"
+            if activity.id in plan.cancelled:
+                lines.append(f"  {activity.id}: CANCELLED (was {before})")
+                continue
+            a = placed[activity.id]
+            if (a.room_id, a.start_min) == (activity.room_id, activity.start_min):
+                lines.append(f"  {activity.id}: unchanged ({before})")
+            else:
+                after = f"{a.room_id} {format_minute(a.start_min)}"
+                lines.append(f"  {activity.id}: {before} -> {after}")
+        for move in plan.moves:
+            lines.append(
+                f"  equipment: {move.units} x {move.pool_id} -> {move.activity_id}, "
+                f"carried {format_minute(move.start_min)} to {format_minute(move.end_min)}"
+            )
+        fired = ", ".join(t.value for t in rnd.triggers) or "none"
+        decision = rnd.approver or "waiting for an officer"
+        lines.append(
+            f"  Approval triggers: {fired}; approval: {decision}; plan status: {plan.status.value}"
+        )
+        score = " | ".join(f"{label} {getattr(rnd.values, n)}" for n, label in STAGE_LABELS)
+        lines.append(f"  Score: {score}")
+    lines.append(f"Event log: {rounds[-1].log_version} event(s) in {db}")
     return "\n".join(lines)
 
 

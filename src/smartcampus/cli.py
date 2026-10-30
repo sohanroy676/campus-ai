@@ -5,12 +5,14 @@ from typing import Annotated
 
 import typer
 
+from smartcampus.coordinator.followups import FollowupError, load_followups
+from smartcampus.coordinator.loop import recover
 from smartcampus.coordinator.run import Method, run_scenario
 from smartcampus.eval.harness import run_eval, run_one
 from smartcampus.eval.report import format_report
 from smartcampus.generator.scenario import ScenarioError, load_scenario, save_scenario
 from smartcampus.generator.synth import GeneratorError, generate_scenario
-from smartcampus.reporting.summary import format_summary, write_report
+from smartcampus.reporting.summary import format_cascade, format_summary, write_report
 from smartcampus.rules.validator import PlanInvalidError
 from smartcampus.sim.state import InvalidEventError
 from smartcampus.sim.store import EventStore
@@ -73,6 +75,48 @@ def run(
     if report is not None:
         write_report(result, scenario, report)
         typer.echo(f"Report: {report}")
+
+
+@app.command()
+def cascade(
+    scenario: Annotated[Path, typer.Argument(help="Scenario JSON file.")],
+    followups: Annotated[
+        Path | None,
+        typer.Option(help="JSON list of later events (e.g. a repair overrun) to re-plan after."),
+    ] = None,
+    method: Annotated[Method, typer.Option(help="Recovery method.")] = Method.JOINT,
+    auto_approve: Annotated[
+        bool,
+        typer.Option(
+            "--auto-approve/--no-auto-approve",
+            help="Demo mode: apply plans that fire approval triggers and log it as auto.",
+        ),
+    ] = True,
+    db: Annotated[
+        Path,
+        typer.Option(help="Event log (SQLite). An earlier event log at this path is replaced."),
+    ] = Path("var/campus.db"),
+) -> None:
+    """Run a scenario, then re-plan after each later event.
+
+    Exit codes: 0 done (a plan may still be waiting for approval); 1 no plan exists; 2 bad
+    scenario, follow-up file or options; 3 internal error (a plan broke a hard rule).
+    """
+    try:
+        problem = load_scenario(scenario)
+        later = load_followups(followups) if followups is not None else []
+        with EventStore.create_fresh(db) as store:
+            rounds = recover(problem, store, method, later, auto_approve=auto_approve)
+    except (ScenarioError, FollowupError, InvalidEventError, ValueError) as error:
+        typer.echo(f"smartcampus cascade: {error}", err=True)
+        raise typer.Exit(code=2) from error
+    except (InfeasibleInputError, NoSolutionError) as error:
+        typer.echo(f"smartcampus cascade: no plan: {error}", err=True)
+        raise typer.Exit(code=1) from error
+    except PlanInvalidError as error:
+        typer.echo(f"smartcampus cascade: internal error: {error}", err=True)
+        raise typer.Exit(code=3) from error
+    typer.echo(format_cascade(rounds, scenario, followups, db))
 
 
 def _parse_methods(text: str) -> list[Method]:

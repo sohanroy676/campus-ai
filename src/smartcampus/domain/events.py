@@ -1,8 +1,8 @@
 """Event schemas for the append-only log. Schemas only; `sim/` owns writing them."""
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from smartcampus.domain.base import FrozenModel
 from smartcampus.domain.entities import Fault, SafetyHold
@@ -30,9 +30,27 @@ class SafetyHoldPlaced(_EventBase):
     hold: SafetyHold
 
 
+class Approval(FrozenModel):
+    """Who let a plan through the approval triggers (spec section 6), and which triggers fired.
+
+    Recorded inside `PlanApplied` rather than as its own event: an extra event would change the
+    state version and make the plan it approves stale.
+    """
+
+    approver: Literal["not_needed", "auto", "officer"]
+    triggers: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _triggers_need_a_decision(self) -> Self:
+        if self.approver == "not_needed" and self.triggers:
+            raise ValueError("a plan that fired approval triggers cannot be marked not_needed")
+        return self
+
+
 class PlanApplied(_EventBase):
     type: Literal["plan_applied"] = "plan_applied"
     plan: Plan
+    approval: Approval | None = None  # None for plans applied without the approval step
 
 
 Event = Annotated[
