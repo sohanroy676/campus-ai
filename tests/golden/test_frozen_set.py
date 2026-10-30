@@ -16,9 +16,9 @@ from smartcampus.generator.synth import GENERATOR_VERSION, generate_scenario
 FROZEN = Path(__file__).parents[2] / "scenarios" / "frozen"
 
 SIZES = ("small", "medium")
-LOADS = (50, 75)
+LOADS = (50, 75, 90)
 SEVERITIES = ("room", "building", "hold")
-SEEDS = (1, 2)
+SEEDS = tuple(range(1, 16))  # large joins when its time tier is measured (135 per size)
 
 EXPECTED = sorted(
     f"{size}-l{load}-{severity}-s{seed}.json"

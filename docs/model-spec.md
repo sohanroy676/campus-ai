@@ -85,5 +85,5 @@ Solve the stages in order. After each stage, add the constraint "stage value `<=
 - Severity: `room` (one room fault), `building` (every room of one building), `hold` (a safety hold on the GPU pool of a class that needs it, else on the room). The disruption starts when a chosen class starts; plan time is two hours earlier. A repair overrun is an event, not scenario data, so it is not a severity.
 - The baseline obeys the rules (including R6 travel). A scenario is only returned if cancelling every movable class is a valid plan.
 - `provenance` (generator version, seed, size, load, severity) is written into the scenario file and copied into the run report. Hand-made scenarios have none (`null` in the report).
-- Known limit: joint finds no plan within the 10 s first stage for medium at load 90, so do not freeze that combination.
+- Medium at load 90 (checked 2026-10-30 with the medium tier of section 5, seeds 1 and 2, room/building/hold): joint returns a plan on all 6, so the combination stays in the frozen set. Greedy start plan 5 to 367 s, first-stage presolve 0.9 to 4.5 s, total 18 to 460 s per scenario.
 - Evaluation set: the frozen v1.0 set is 405 instances in `scenarios/frozen/`; 20 smoke instances are separate and not counted. `scenarios/frozen/` holds 24 of them so far (12 small, 12 medium).

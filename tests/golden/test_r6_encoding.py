@@ -30,8 +30,9 @@ from smartcampus.rules.base import RuleId
 from smartcampus.rules.variables import DecisionVars, build_variables
 
 ROOT = Path(__file__).parents[2] / "scenarios"
-SMALL = sorted((ROOT / "frozen").glob("small-*.json"))
-MEDIUM = sorted((ROOT / "frozen").glob("medium-*.json"))
+# The original 24 (loads 50 and 75, seeds 1 and 2): the old pairwise encoding is too slow for all 270.
+SMALL = sorted((ROOT / "frozen").glob("small-l[57][05]-*-s[12].json"))
+MEDIUM = sorted((ROOT / "frozen").glob("medium-l[57][05]-*-s[12].json"))
 
 
 def post_pairwise(ctx: DecisionVars, kept: set[int]) -> None:
