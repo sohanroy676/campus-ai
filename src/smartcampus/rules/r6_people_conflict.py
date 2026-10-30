@@ -80,13 +80,19 @@ def _forbid_far_back_to_back(ctx: DecisionVars, options: list[Placement]) -> Non
     """One person: nothing ends in building b at time t while something starts in a far b' at t.
 
     Same pairs as checking every two options with `is_too_far`, but grouped by (time, building) so
-    the model grows with the number of time boundaries, not with the number of option pairs.
+    the model grows with the number of time boundaries, not with the number of option pairs. Each
+    group is built from per-class literals that every person of that class shares.
     """
-    ending: dict[int, dict[str, list[Placement]]] = defaultdict(lambda: defaultdict(list))
-    starting: dict[int, dict[str, list[Placement]]] = defaultdict(lambda: defaultdict(list))
+    # time -> building -> class id -> that class's placements ending (or starting) there
+    ending: dict[int, dict[str, dict[str, list[Placement]]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(list))
+    )
+    starting: dict[int, dict[str, dict[str, list[Placement]]]] = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(list))
+    )
     for option in options:
-        ending[option.end][option.room.building_id].append(option)
-        starting[option.start][option.room.building_id].append(option)
+        ending[option.end][option.room.building_id][option.activity.id].append(option)
+        starting[option.start][option.room.building_id][option.activity.id].append(option)
     campus = ctx.problem.campus
     for time, ends_by_building in ending.items():
         starts_by_building = starting.get(time)
@@ -105,8 +111,28 @@ def _forbid_far_back_to_back(ctx: DecisionVars, options: list[Placement]) -> Non
                     ("start", start_building, starts),
                 ):
                     if (side, building) not in made:
-                        made[side, building] = _any_happens(ctx, group)
+                        made[side, building] = _group_literal(ctx, building, group)
                 _forbid_together(ctx, made["end", end_building], made["start", start_building])
+
+
+def _group_literal(
+    ctx: DecisionVars, building: str, by_class: dict[str, list[Placement]]
+) -> cp_model.IntVar | None:
+    """A literal true whenever some placement in the group happens; None if one is fixed."""
+    # A class's placements with one start in one building share a literal across all its people.
+    literals = [
+        ctx.building_start_literals(class_id)[group[0].start, building]
+        for class_id, group in by_class.items()
+    ]
+    if any(literal is None for literal in literals):
+        return None
+    if len(literals) == 1:
+        return literals[0]
+    person = ctx.model.new_bool_var("")
+    for literal in literals:
+        assert literal is not None
+        ctx.model.add_implication(literal, person)
+    return person
 
 
 def _forbid_together(
@@ -121,16 +147,3 @@ def _forbid_together(
         ctx.model.add(only == 0).only_enforce_if(lit)
     else:
         ctx.model.add_bool_or([first.negated(), second.negated()]).only_enforce_if(lit)
-
-
-def _any_happens(ctx: DecisionVars, group: list[Placement]) -> cp_model.IntVar | None:
-    """A literal true whenever some option in `group` happens; None if one is fixed (so always)."""
-    if any(option.var is None for option in group):
-        return None
-    variables = [option.var for option in group if option.var is not None]
-    if len(variables) == 1:
-        return variables[0]
-    indicator = ctx.model.new_bool_var("")
-    for var in variables:
-        ctx.model.add_implication(var, indicator)
-    return indicator

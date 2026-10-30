@@ -40,3 +40,34 @@ Cause of the build time: `r6_people_conflict.post` looked at every pair of place
 - Medium is not frozen. Open: presolve time (6 to 18 s) is larger than a 10 s stage. Next options are a smaller model elsewhere (R4, R5 and the objective expressions still add many constraints), or a new time split, which needs the user's decision.
 - Greedy is slow on some medium scenarios (up to 435 s on `medium-l75-building-s1`), and `joint` now runs it first. Joint's wall time is greedy time plus 30 s.
 - Changing the output of the generator for a seed still needs a new `GENERATOR_VERSION`; this change does not touch the generator.
+
+## Update: second step, smaller models for R4, R5 and the objective (2026-10-30)
+Same method as R6: the same plans are allowed, the model is smaller. The existing agreement tests pass unchanged. `tests/golden/test_equipment_encoding.py` keeps the old R4 and R5 encodings as a reference and checks on all 24 scenarios that the old encoding, the new one and the validator give the same verdict on plans with equipment moves (home, fed, late, short, crowded, unneeded, overrun).
+
+What changed:
+- Placements of a class are grouped once, by (start, building), and the coarser literals (by start, by end, "placed") are built from those (`DecisionVars.building_start_literals`, `start_literals`, `placed_literal`). R4, R5 and R6 share them.
+- R5 and the return trip in R4 used one constraint per (class, pool, placement). They now use per-class earliest and latest start variables (`start_bounds`): the move ends before the earliest chosen start, and the return time lies between the earliest and the latest.
+- R4 turns all placements it never allows into one linear constraint, and groups the equipment-need constraints by (class, room, type, shortfall).
+- The objective builds each stage's helper variables just before that stage is minimized (`stage_expression`), so stage 1 no longer carries the helpers of stages 2 to 6. `stage_expressions` still returns all six and is what the objective tests use.
+
+Result on the 5 scenarios that had no plan (model only, 10 s probe):
+
+| Scenario | Constraints before / after | Presolve before / after |
+|---|---|---|
+| medium-l50-building-s2 | 300k / 62k | 6.2 s / 1.9 s |
+| medium-l75-building-s1 | 229k / 48k | 8.6 s / 2.8 s |
+| medium-l75-hold-s2 | 333k / 57k | over 10 s / 5.0 s |
+| medium-l75-room-s1 | 159k / 29k | 9.2 s / 2.4 s |
+| medium-l75-room-s2 | 556k / 116k | over 10 s / 4.3 s |
+
+What presolve time follows: each presolve pass probes every Boolean (about 58k literals, about 1.2 s) and runs several passes, so the cost follows the number of Booleans and at-most-one groups, not the constraint count. Leaving out R2 alone saved about 2 s on `medium-l75-hold-s2`, R5 about 1.7 s, R6 about 1.1 s. Dropping wrong-room-type placements before posting rules changed almost nothing (presolve removes them early).
+
+Gate run on all 12 medium scenarios with the greedy plan as the start (greedy and joint timed separately, spec time split unchanged at 10/10/3/3/2/2):
+- Joint returns a plan on 10 of 12. No plan on `medium-l75-hold-s2` (presolve 5.0 s) and `medium-l75-room-s2` (presolve 4.3 s, no solution in the 10 s first stage even with the hint).
+- On `medium-l75-building-s1` and `medium-l75-building-s2` stage 1 ends at its time limit (4 and 1 cancellations) and later stages get no time, so those plans are close to the greedy plan.
+- Joint wall time (not counting greedy): 3 to 8 s on load 50 except `medium-l50-building-s2` (18 s); 8 to 32 s on load 75.
+- Greedy wall time: 2 to 71 s, except 230 s (`medium-l75-building-s2`) and 437 s (`medium-l75-building-s1`).
+
+Greedy profile (`medium-l75-room-s1`, 56 s under the profiler): greedy calls `validate()` on the whole timetable for each of its 205 candidate steps, and 80% of that is the pairwise loop in R6's `check` (38 million `shares_person` calls). Speeding up `check` by indexing placements per person, with the same output order, would remove most of it; it is a separate defect and is not fixed here. Greedy time is not part of the joint times above.
+
+Medium stays in `scenarios/candidates/medium/`. Open decision: a separate time tier for medium in the spec, or leave medium out of the frozen set.

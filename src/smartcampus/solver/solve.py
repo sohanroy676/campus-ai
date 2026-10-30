@@ -17,7 +17,7 @@ from smartcampus.rules.registry import ALL_RULES
 from smartcampus.rules.validator import assert_valid
 from smartcampus.rules.variables import DecisionVars, build_variables
 from smartcampus.solver.explain import explain_infeasibility
-from smartcampus.solver.objective import StageValues, evaluate, stage_expressions
+from smartcampus.solver.objective import StageValues, evaluate, stage_expression
 
 STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", "tie_break")
 
@@ -77,7 +77,6 @@ def solve(
     for rule in ALL_RULES:
         rule.post(ctx)
         ctx.model.add(ctx.rule_lit[rule.id] == 1)
-    expressions = stage_expressions(ctx)
     if hint is None:
         _hint_cancel_everything(ctx)
     else:
@@ -88,9 +87,8 @@ def solve(
     solver.parameters.random_seed = settings.random_seed
     reports: list[StageReport] = []
     best: Plan | None = None
-    for name, expression, seconds in zip(
-        STAGE_NAMES, expressions, settings.stage_seconds, strict=True
-    ):
+    for index, (name, seconds) in enumerate(zip(STAGE_NAMES, settings.stage_seconds, strict=True)):
+        expression = stage_expression(ctx, index)  # its helper variables join the model only now
         ctx.model.minimize(expression)
         solver.parameters.max_time_in_seconds = seconds
         status = solver.solve(ctx.model)
