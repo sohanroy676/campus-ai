@@ -88,9 +88,15 @@
   - Eval: `eval/metrics.py`, `harness.py`, `stats.py`, `report.py`; `smartcampus eval` (resumable `results.jsonl`, `report.md`) and `compare`; spec section 10. Smoke run on 6 small scenarios x 4 methods: plan on all 24
   - 989 tests pass (about 8.5 min); `ruff`, `mypy src` pass
 
+- Repair-overrun loop and approval triggers on `feature/recovery-loop` (from `feature/frozen-grid`; local, not pushed) - 2026-10-30
+  - `coordinator/approval.py` (`triggers`), `replan.py` (`replan_problem`: applied plans folded in, plan time = log clock, earlier moves in `prior_moves_this_week`, touched unstarted classes recoverable again), `followups.py`, `loop.py` (`recover`), `run.plan_with_method` (planning step moved out of `run_scenario`, behaviour unchanged)
+  - Approval is a field on `PlanApplied` (`Approval`), not its own event (it would stale the plan); deviation from the plan the user saw, reason in ADR 0008. Spec section 6 extended
+  - CLI `smartcampus cascade <scenario> --followups <file> [--auto-approve/--no-auto-approve]`; demo `scenarios/dev/ac-cascade.json` (the AC demo plus `robotics-lab`) and `ac-cascade-overrun.json`; saved output `docs/results/cascade-demo-2026-10-30.txt`
+  - Tests: `tests/unit/test_approval.py`, `test_loop.py`
+
 ## In progress
 
-- Next feature: repair-overrun loop and approval triggers. The full evaluation waits until every feature is built (ADR 0007).
+- Next feature: contract-net (short spec section first, show the user). The full evaluation waits until every feature is built (ADR 0007).
 
 ## Next
 
