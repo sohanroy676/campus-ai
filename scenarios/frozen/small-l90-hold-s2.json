@@ -1,0 +1,4522 @@
+{
+  "campus": {
+    "buildings": [
+      {
+        "id": "B1"
+      },
+      {
+        "id": "B2"
+      }
+    ],
+    "rooms": [
+      {
+        "id": "B1-lec-01",
+        "building_id": "B1",
+        "type": "lecture",
+        "capacity": 40,
+        "step_free": true
+      },
+      {
+        "id": "B1-lab-01",
+        "building_id": "B1",
+        "type": "lab",
+        "capacity": 30,
+        "step_free": true
+      },
+      {
+        "id": "B1-lec-02",
+        "building_id": "B1",
+        "type": "lecture",
+        "capacity": 60,
+        "step_free": true
+      },
+      {
+        "id": "B1-lab-02",
+        "building_id": "B1",
+        "type": "lab",
+        "capacity": 40,
+        "step_free": true
+      },
+      {
+        "id": "B2-lec-01",
+        "building_id": "B2",
+        "type": "lecture",
+        "capacity": 60,
+        "step_free": true
+      },
+      {
+        "id": "B2-lab-01",
+        "building_id": "B2",
+        "type": "lab",
+        "capacity": 30,
+        "step_free": true
+      },
+      {
+        "id": "B2-lec-02",
+        "building_id": "B2",
+        "type": "lecture",
+        "capacity": 60,
+        "step_free": true
+      },
+      {
+        "id": "B2-lab-02",
+        "building_id": "B2",
+        "type": "lab",
+        "capacity": 30,
+        "step_free": false
+      }
+    ],
+    "pools": [
+      {
+        "id": "gpu-B1-lab-01",
+        "type": "gpu",
+        "room_id": "B1-lab-01",
+        "units": 4,
+        "movable": true,
+        "move_minutes_per_unit": 5
+      },
+      {
+        "id": "gpu-B1-lab-02",
+        "type": "gpu",
+        "room_id": "B1-lab-02",
+        "units": 4,
+        "movable": true,
+        "move_minutes_per_unit": 5
+      },
+      {
+        "id": "gpu-B2-lab-01",
+        "type": "gpu",
+        "room_id": "B2-lab-01",
+        "units": 4,
+        "movable": true,
+        "move_minutes_per_unit": 5
+      },
+      {
+        "id": "gpu-B2-lab-02",
+        "type": "gpu",
+        "room_id": "B2-lab-02",
+        "units": 4,
+        "movable": true,
+        "move_minutes_per_unit": 5
+      }
+    ],
+    "walks": [
+      {
+        "a": "B1",
+        "b": "B2",
+        "minutes": 9
+      }
+    ]
+  },
+  "cohorts": [
+    {
+      "id": "coh-001",
+      "size": 29,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-002",
+      "size": 29,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-003",
+      "size": 16,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-004",
+      "size": 19,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-005",
+      "size": 30,
+      "step_free_required": true
+    },
+    {
+      "id": "coh-006",
+      "size": 14,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-007",
+      "size": 20,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-008",
+      "size": 25,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-009",
+      "size": 12,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-010",
+      "size": 14,
+      "step_free_required": true
+    },
+    {
+      "id": "coh-011",
+      "size": 16,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-012",
+      "size": 13,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-013",
+      "size": 24,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-014",
+      "size": 19,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-015",
+      "size": 21,
+      "step_free_required": false
+    },
+    {
+      "id": "coh-016",
+      "size": 15,
+      "step_free_required": false
+    }
+  ],
+  "faculty": [
+    {
+      "id": "fac-001"
+    },
+    {
+      "id": "fac-002"
+    },
+    {
+      "id": "fac-003"
+    },
+    {
+      "id": "fac-004"
+    },
+    {
+      "id": "fac-005"
+    },
+    {
+      "id": "fac-006"
+    },
+    {
+      "id": "fac-007"
+    },
+    {
+      "id": "fac-008"
+    },
+    {
+      "id": "fac-009"
+    },
+    {
+      "id": "fac-010"
+    },
+    {
+      "id": "fac-011"
+    },
+    {
+      "id": "fac-012"
+    },
+    {
+      "id": "fac-013"
+    },
+    {
+      "id": "fac-014"
+    },
+    {
+      "id": "fac-015"
+    },
+    {
+      "id": "fac-016"
+    }
+  ],
+  "activities": [
+    {
+      "id": "act-0001",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 480
+    },
+    {
+      "id": "act-0002",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-006",
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 480
+    },
+    {
+      "id": "act-0003",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 480
+    },
+    {
+      "id": "act-0004",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 480
+    },
+    {
+      "id": "act-0005",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 480
+    },
+    {
+      "id": "act-0006",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 480
+    },
+    {
+      "id": "act-0007",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 510
+    },
+    {
+      "id": "act-0008",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 510
+    },
+    {
+      "id": "act-0009",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 540
+    },
+    {
+      "id": "act-0010",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 540
+    },
+    {
+      "id": "act-0011",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 570
+    },
+    {
+      "id": "act-0012",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 600
+    },
+    {
+      "id": "act-0013",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 600
+    },
+    {
+      "id": "act-0014",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 600
+    },
+    {
+      "id": "act-0015",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 600
+    },
+    {
+      "id": "act-0016",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 600
+    },
+    {
+      "id": "act-0017",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 630
+    },
+    {
+      "id": "act-0018",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 630
+    },
+    {
+      "id": "act-0019",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 630
+    },
+    {
+      "id": "act-0020",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 660
+    },
+    {
+      "id": "act-0021",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 660
+    },
+    {
+      "id": "act-0022",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-001",
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 660
+    },
+    {
+      "id": "act-0023",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 690
+    },
+    {
+      "id": "act-0024",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 690
+    },
+    {
+      "id": "act-0025",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 690
+    },
+    {
+      "id": "act-0026",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 750
+    },
+    {
+      "id": "act-0027",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 750
+    },
+    {
+      "id": "act-0028",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 750
+    },
+    {
+      "id": "act-0029",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 750
+    },
+    {
+      "id": "act-0030",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 750
+    },
+    {
+      "id": "act-0031",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 780
+    },
+    {
+      "id": "act-0032",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 780
+    },
+    {
+      "id": "act-0033",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 780
+    },
+    {
+      "id": "act-0034",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 810
+    },
+    {
+      "id": "act-0035",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 810
+    },
+    {
+      "id": "act-0036",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 810
+    },
+    {
+      "id": "act-0037",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 840
+    },
+    {
+      "id": "act-0038",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 840
+    },
+    {
+      "id": "act-0039",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 840
+    },
+    {
+      "id": "act-0040",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-004",
+        "fac-005"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 870
+    },
+    {
+      "id": "act-0041",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 870
+    },
+    {
+      "id": "act-0042",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 870
+    },
+    {
+      "id": "act-0043",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 900
+    },
+    {
+      "id": "act-0044",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 900
+    },
+    {
+      "id": "act-0045",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 900
+    },
+    {
+      "id": "act-0046",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 900
+    },
+    {
+      "id": "act-0047",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 930
+    },
+    {
+      "id": "act-0048",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 930
+    },
+    {
+      "id": "act-0049",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 930
+    },
+    {
+      "id": "act-0050",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 960
+    },
+    {
+      "id": "act-0051",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 990
+    },
+    {
+      "id": "act-0052",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-002",
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 990
+    },
+    {
+      "id": "act-0053",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 990
+    },
+    {
+      "id": "act-0054",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 990
+    },
+    {
+      "id": "act-0055",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-006",
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 990
+    },
+    {
+      "id": "act-0056",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-007",
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 1020
+    },
+    {
+      "id": "act-0057",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 1020
+    },
+    {
+      "id": "act-0058",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 1020
+    },
+    {
+      "id": "act-0059",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0060",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0061",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-003",
+        "fac-012"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0062",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0063",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0064",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 1920
+    },
+    {
+      "id": "act-0065",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 1950
+    },
+    {
+      "id": "act-0066",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 1950
+    },
+    {
+      "id": "act-0067",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 1980
+    },
+    {
+      "id": "act-0068",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2010
+    },
+    {
+      "id": "act-0069",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2010
+    },
+    {
+      "id": "act-0070",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 2040
+    },
+    {
+      "id": "act-0071",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 2040
+    },
+    {
+      "id": "act-0072",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2040
+    },
+    {
+      "id": "act-0073",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2070
+    },
+    {
+      "id": "act-0074",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 2070
+    },
+    {
+      "id": "act-0075",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 2070
+    },
+    {
+      "id": "act-0076",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-015",
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2070
+    },
+    {
+      "id": "act-0077",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 2100
+    },
+    {
+      "id": "act-0078",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 2100
+    },
+    {
+      "id": "act-0079",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-012",
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2100
+    },
+    {
+      "id": "act-0080",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 2130
+    },
+    {
+      "id": "act-0081",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-013",
+        "fac-015"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 2160
+    },
+    {
+      "id": "act-0082",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 2160
+    },
+    {
+      "id": "act-0083",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2160
+    },
+    {
+      "id": "act-0084",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2160
+    },
+    {
+      "id": "act-0085",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2160
+    },
+    {
+      "id": "act-0086",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 2190
+    },
+    {
+      "id": "act-0087",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 2190
+    },
+    {
+      "id": "act-0088",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 2190
+    },
+    {
+      "id": "act-0089",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2220
+    },
+    {
+      "id": "act-0090",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2220
+    },
+    {
+      "id": "act-0091",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2220
+    },
+    {
+      "id": "act-0092",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 2250
+    },
+    {
+      "id": "act-0093",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 2250
+    },
+    {
+      "id": "act-0094",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 2250
+    },
+    {
+      "id": "act-0095",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2280
+    },
+    {
+      "id": "act-0096",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2280
+    },
+    {
+      "id": "act-0097",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2280
+    },
+    {
+      "id": "act-0098",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 2310
+    },
+    {
+      "id": "act-0099",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 2310
+    },
+    {
+      "id": "act-0100",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 2310
+    },
+    {
+      "id": "act-0101",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 2310
+    },
+    {
+      "id": "act-0102",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 2340
+    },
+    {
+      "id": "act-0103",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-005",
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2340
+    },
+    {
+      "id": "act-0104",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2340
+    },
+    {
+      "id": "act-0105",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 2370
+    },
+    {
+      "id": "act-0106",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2370
+    },
+    {
+      "id": "act-0107",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 2370
+    },
+    {
+      "id": "act-0108",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 2400
+    },
+    {
+      "id": "act-0109",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 2400
+    },
+    {
+      "id": "act-0110",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 2400
+    },
+    {
+      "id": "act-0111",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2400
+    },
+    {
+      "id": "act-0112",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 2430
+    },
+    {
+      "id": "act-0113",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 2430
+    },
+    {
+      "id": "act-0114",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-009",
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 2460
+    },
+    {
+      "id": "act-0115",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 2460
+    },
+    {
+      "id": "act-0116",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 2460
+    },
+    {
+      "id": "act-0117",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0118",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0119",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0120",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-012",
+        "fac-016"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0121",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0122",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0123",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3360
+    },
+    {
+      "id": "act-0124",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3390
+    },
+    {
+      "id": "act-0125",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3420
+    },
+    {
+      "id": "act-0126",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-002",
+        "fac-011"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 3420
+    },
+    {
+      "id": "act-0127",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3420
+    },
+    {
+      "id": "act-0128",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3420
+    },
+    {
+      "id": "act-0129",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 3450
+    },
+    {
+      "id": "act-0130",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 3480
+    },
+    {
+      "id": "act-0131",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-003",
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3480
+    },
+    {
+      "id": "act-0132",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 3480
+    },
+    {
+      "id": "act-0133",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3480
+    },
+    {
+      "id": "act-0134",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3480
+    },
+    {
+      "id": "act-0135",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3510
+    },
+    {
+      "id": "act-0136",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-006",
+        "fac-014"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 3540
+    },
+    {
+      "id": "act-0137",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 3540
+    },
+    {
+      "id": "act-0138",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3570
+    },
+    {
+      "id": "act-0139",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3570
+    },
+    {
+      "id": "act-0140",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 3570
+    },
+    {
+      "id": "act-0141",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3570
+    },
+    {
+      "id": "act-0142",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-005",
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3570
+    },
+    {
+      "id": "act-0143",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 3600
+    },
+    {
+      "id": "act-0144",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3630
+    },
+    {
+      "id": "act-0145",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3630
+    },
+    {
+      "id": "act-0146",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 3630
+    },
+    {
+      "id": "act-0147",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3630
+    },
+    {
+      "id": "act-0148",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 3660
+    },
+    {
+      "id": "act-0149",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3660
+    },
+    {
+      "id": "act-0150",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 3690
+    },
+    {
+      "id": "act-0151",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3690
+    },
+    {
+      "id": "act-0152",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 3690
+    },
+    {
+      "id": "act-0153",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-010",
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 3690
+    },
+    {
+      "id": "act-0154",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3690
+    },
+    {
+      "id": "act-0155",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3720
+    },
+    {
+      "id": "act-0156",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 3750
+    },
+    {
+      "id": "act-0157",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3750
+    },
+    {
+      "id": "act-0158",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 3750
+    },
+    {
+      "id": "act-0159",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3750
+    },
+    {
+      "id": "act-0160",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3750
+    },
+    {
+      "id": "act-0161",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3780
+    },
+    {
+      "id": "act-0162",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 3780
+    },
+    {
+      "id": "act-0163",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3810
+    },
+    {
+      "id": "act-0164",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-011",
+        "fac-013"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 3810
+    },
+    {
+      "id": "act-0165",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3810
+    },
+    {
+      "id": "act-0166",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3810
+    },
+    {
+      "id": "act-0167",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 3840
+    },
+    {
+      "id": "act-0168",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 3840
+    },
+    {
+      "id": "act-0169",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-008",
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3840
+    },
+    {
+      "id": "act-0170",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 3870
+    },
+    {
+      "id": "act-0171",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0172",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0173",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0174",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0175",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0176",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 3900
+    },
+    {
+      "id": "act-0177",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0178",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0179",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0180",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-012",
+        "fac-014"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0181",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-005",
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0182",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0183",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 4800
+    },
+    {
+      "id": "act-0184",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 4830
+    },
+    {
+      "id": "act-0185",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 4860
+    },
+    {
+      "id": "act-0186",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 4860
+    },
+    {
+      "id": "act-0187",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-002",
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 4860
+    },
+    {
+      "id": "act-0188",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-008",
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 4860
+    },
+    {
+      "id": "act-0189",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 4860
+    },
+    {
+      "id": "act-0190",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 4920
+    },
+    {
+      "id": "act-0191",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 4920
+    },
+    {
+      "id": "act-0192",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-001",
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 4920
+    },
+    {
+      "id": "act-0193",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 4920
+    },
+    {
+      "id": "act-0194",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 4950
+    },
+    {
+      "id": "act-0195",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 4950
+    },
+    {
+      "id": "act-0196",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0197",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0198",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-009",
+        "fac-011"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0199",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0200",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0201",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 4980
+    },
+    {
+      "id": "act-0202",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 5010
+    },
+    {
+      "id": "act-0203",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 5040
+    },
+    {
+      "id": "act-0204",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-008",
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 5040
+    },
+    {
+      "id": "act-0205",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 5040
+    },
+    {
+      "id": "act-0206",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 5070
+    },
+    {
+      "id": "act-0207",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 5070
+    },
+    {
+      "id": "act-0208",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 5070
+    },
+    {
+      "id": "act-0209",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-013",
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 5070
+    },
+    {
+      "id": "act-0210",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 5100
+    },
+    {
+      "id": "act-0211",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0212",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0213",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-002",
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0214",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0215",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0216",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 5130
+    },
+    {
+      "id": "act-0217",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-001",
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 5160
+    },
+    {
+      "id": "act-0218",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 5190
+    },
+    {
+      "id": "act-0219",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 5190
+    },
+    {
+      "id": "act-0220",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 5220
+    },
+    {
+      "id": "act-0221",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-004",
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 5220
+    },
+    {
+      "id": "act-0222",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-016",
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 5220
+    },
+    {
+      "id": "act-0223",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 5220
+    },
+    {
+      "id": "act-0224",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 5220
+    },
+    {
+      "id": "act-0225",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 5250
+    },
+    {
+      "id": "act-0226",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 5280
+    },
+    {
+      "id": "act-0227",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 5310
+    },
+    {
+      "id": "act-0228",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 5310
+    },
+    {
+      "id": "act-0229",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-008",
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 5310
+    },
+    {
+      "id": "act-0230",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-001"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 5310
+    },
+    {
+      "id": "act-0231",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 5310
+    },
+    {
+      "id": "act-0232",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 5340
+    },
+    {
+      "id": "act-0233",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 5340
+    },
+    {
+      "id": "act-0234",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-007",
+        "fac-016"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0235",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0236",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0237",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0238",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0239",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-009"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0240",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6240
+    },
+    {
+      "id": "act-0241",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6270
+    },
+    {
+      "id": "act-0242",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-012",
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6300
+    },
+    {
+      "id": "act-0243",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 6330
+    },
+    {
+      "id": "act-0244",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6330
+    },
+    {
+      "id": "act-0245",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6330
+    },
+    {
+      "id": "act-0246",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 6330
+    },
+    {
+      "id": "act-0247",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6330
+    },
+    {
+      "id": "act-0248",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 4
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 6360
+    },
+    {
+      "id": "act-0249",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-009",
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6360
+    },
+    {
+      "id": "act-0250",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6390
+    },
+    {
+      "id": "act-0251",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6390
+    },
+    {
+      "id": "act-0252",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 6390
+    },
+    {
+      "id": "act-0253",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 6390
+    },
+    {
+      "id": "act-0254",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6420
+    },
+    {
+      "id": "act-0255",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0256",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-015",
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0257",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0258",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0259",
+      "cohort_id": "coh-006",
+      "faculty_ids": [
+        "fac-008",
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0260",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-013",
+        "fac-009"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6450
+    },
+    {
+      "id": "act-0261",
+      "cohort_id": "coh-009",
+      "faculty_ids": [
+        "fac-010"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-02",
+      "start_min": 6510
+    },
+    {
+      "id": "act-0262",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-016"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6510
+    },
+    {
+      "id": "act-0263",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-001",
+        "fac-006"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 6540
+    },
+    {
+      "id": "act-0264",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-009",
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6540
+    },
+    {
+      "id": "act-0265",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6540
+    },
+    {
+      "id": "act-0266",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-01",
+      "start_min": 6540
+    },
+    {
+      "id": "act-0267",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6540
+    },
+    {
+      "id": "act-0268",
+      "cohort_id": "coh-010",
+      "faculty_ids": [
+        "fac-007"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-01",
+      "start_min": 6570
+    },
+    {
+      "id": "act-0269",
+      "cohort_id": "coh-016",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6570
+    },
+    {
+      "id": "act-0270",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6600
+    },
+    {
+      "id": "act-0271",
+      "cohort_id": "coh-002",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lab-02",
+      "start_min": 6630
+    },
+    {
+      "id": "act-0272",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-005"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6630
+    },
+    {
+      "id": "act-0273",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 6630
+    },
+    {
+      "id": "act-0274",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-001",
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6630
+    },
+    {
+      "id": "act-0275",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-002"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-01",
+      "start_min": 6660
+    },
+    {
+      "id": "act-0276",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6660
+    },
+    {
+      "id": "act-0277",
+      "cohort_id": "coh-011",
+      "faculty_ids": [
+        "fac-009",
+        "fac-011"
+      ],
+      "duration_slots": 3,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 6660
+    },
+    {
+      "id": "act-0278",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6660
+    },
+    {
+      "id": "act-0279",
+      "cohort_id": "coh-013",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6690
+    },
+    {
+      "id": "act-0280",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-013"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 1
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 6720
+    },
+    {
+      "id": "act-0281",
+      "cohort_id": "coh-015",
+      "faculty_ids": [
+        "fac-003"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6720
+    },
+    {
+      "id": "act-0282",
+      "cohort_id": "coh-003",
+      "faculty_ids": [
+        "fac-006"
+      ],
+      "duration_slots": 4,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 3
+      },
+      "room_id": "B2-lab-02",
+      "start_min": 6720
+    },
+    {
+      "id": "act-0283",
+      "cohort_id": "coh-007",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6720
+    },
+    {
+      "id": "act-0284",
+      "cohort_id": "coh-004",
+      "faculty_ids": [
+        "fac-008"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-01",
+      "start_min": 6750
+    },
+    {
+      "id": "act-0285",
+      "cohort_id": "coh-012",
+      "faculty_ids": [
+        "fac-009",
+        "fac-014"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lab-01",
+      "start_min": 6750
+    },
+    {
+      "id": "act-0286",
+      "cohort_id": "coh-008",
+      "faculty_ids": [
+        "fac-001",
+        "fac-010"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lab"
+      ],
+      "required_equipment": {
+        "gpu": 2
+      },
+      "room_id": "B1-lab-02",
+      "start_min": 6780
+    },
+    {
+      "id": "act-0287",
+      "cohort_id": "coh-001",
+      "faculty_ids": [
+        "fac-012"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B1-lec-02",
+      "start_min": 6780
+    },
+    {
+      "id": "act-0288",
+      "cohort_id": "coh-014",
+      "faculty_ids": [
+        "fac-015"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-01",
+      "start_min": 6780
+    },
+    {
+      "id": "act-0289",
+      "cohort_id": "coh-005",
+      "faculty_ids": [
+        "fac-013",
+        "fac-004"
+      ],
+      "duration_slots": 2,
+      "allowed_room_types": [
+        "lecture"
+      ],
+      "required_equipment": {},
+      "room_id": "B2-lec-02",
+      "start_min": 6780
+    }
+  ],
+  "faults": [],
+  "holds": [
+    {
+      "target_kind": "equipment",
+      "target_id": "gpu-B2-lab-02",
+      "interval": {
+        "start": 5130,
+        "end": 5370
+      }
+    }
+  ],
+  "movable_activity_ids": [
+    "act-0202",
+    "act-0203",
+    "act-0204",
+    "act-0205",
+    "act-0206",
+    "act-0207",
+    "act-0208",
+    "act-0209",
+    "act-0210",
+    "act-0211",
+    "act-0212",
+    "act-0213",
+    "act-0214",
+    "act-0215",
+    "act-0216",
+    "act-0217",
+    "act-0218",
+    "act-0219",
+    "act-0220",
+    "act-0221",
+    "act-0222",
+    "act-0223",
+    "act-0224",
+    "act-0225",
+    "act-0226",
+    "act-0227",
+    "act-0228",
+    "act-0229",
+    "act-0230",
+    "act-0231",
+    "act-0232",
+    "act-0233"
+  ],
+  "window": {
+    "start": 5010,
+    "end": 5400
+  },
+  "plan_time_min": 5010,
+  "staff_available": 2,
+  "prior_moves_this_week": {},
+  "provenance": {
+    "generator_version": "1",
+    "seed": 2,
+    "size": "small",
+    "load": 90,
+    "severity": "hold"
+  }
+}

@@ -8,6 +8,7 @@ from smartcampus.rules._shared import (
     Placement,
     intervals_overlap,
     placements,
+    room_closures,
     room_fault_overlaps,
     room_hold_overlaps,
 )
@@ -24,30 +25,41 @@ def is_closed(problem: RecoveryProblem, placement: Placement) -> bool:
 
 
 def check(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
-    out: list[Violation] = []
     found = placements(problem, plan)
+    closures = room_closures(problem)
+    # Violations are keyed (i, j): a closed room is (i, -1), a double booking of i < j is (i, j).
+    # Sorting by key gives the order of a loop over all i < j. Per room, sort by start and sweep.
+    keyed: list[tuple[int, int, Violation]] = []
+    by_room: dict[str, list[int]] = defaultdict(list)
     for i, p in enumerate(found):
-        if is_closed(problem, p):
-            out.append(
-                Violation(
-                    RuleId.R2,
-                    f"room {p.room.id} is closed while {p.activity.id} is held there",
-                    (p.activity.id,),
-                    (p.room.id,),
-                )
-            )
-        for q in found[i + 1 :]:
-            if p.room.id == q.room.id and intervals_overlap(p.start, p.end, q.start, q.end):
-                ids = tuple(sorted((p.activity.id, q.activity.id)))
-                out.append(
+        by_room[p.room.id].append(i)
+        if any(intervals_overlap(p.start, p.end, s, e) for s, e in closures.get(p.room.id, ())):
+            keyed.append(
+                (
+                    i,
+                    -1,
                     Violation(
                         RuleId.R2,
-                        f"room {p.room.id} hosts {ids[0]} and {ids[1]} at the same time",
-                        ids,
+                        f"room {p.room.id} is closed while {p.activity.id} is held there",
+                        (p.activity.id,),
                         (p.room.id,),
-                    )
+                    ),
                 )
-    return out
+            )
+    for indices in by_room.values():
+        indices.sort(key=lambda k: found[k].start)
+        for pos, a in enumerate(indices):
+            end = found[a].end
+            for b in indices[pos + 1 :]:
+                if found[b].start >= end:
+                    break
+                i, j = min(a, b), max(a, b)
+                ids = tuple(sorted((found[i].activity.id, found[j].activity.id)))
+                room_id = found[i].room.id
+                message = f"room {room_id} hosts {ids[0]} and {ids[1]} at the same time"
+                keyed.append((i, j, Violation(RuleId.R2, message, ids, (room_id,))))
+    keyed.sort(key=lambda item: (item[0], item[1]))
+    return [violation for _, _, violation in keyed]
 
 
 def post(ctx: DecisionVars) -> None:

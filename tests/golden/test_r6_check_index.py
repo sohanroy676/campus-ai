@@ -16,7 +16,10 @@ from smartcampus.rules import r6_people_conflict as r6
 from smartcampus.rules._shared import MAX_BACK_TO_BACK_TRAVEL_MIN, intervals_overlap, placements
 from smartcampus.rules.base import RuleId, Violation
 
-SMALL = sorted((Path(__file__).parents[2] / "scenarios" / "frozen").glob("small-*.json"))
+# The original 12 small ones (loads 50 and 75, seeds 1 and 2): the old all-pairs check is slow.
+SMALL = sorted(
+    (Path(__file__).parents[2] / "scenarios" / "frozen").glob("small-l[57][05]-*-s[12].json")
+)
 
 
 def check_all_pairs(problem: RecoveryProblem, plan: Plan) -> list[Violation]:
