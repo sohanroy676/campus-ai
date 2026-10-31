@@ -1,12 +1,15 @@
 from pathlib import Path
+from typing import Any
 
 import pytest
 
+from smartcampus.baselines.greedy import greedy
 from smartcampus.baselines.resolve import resolve_settings
 from smartcampus.coordinator.run import Method, run_scenario
 from smartcampus.generator.scenario import load_scenario
+from smartcampus.generator.synth import generate_scenario
 from smartcampus.sim.store import EventStore
-from smartcampus.solver.solve import SolverSettings
+from smartcampus.solver.solve import SolveResult, SolverSettings, solve
 
 DEMO = Path(__file__).parents[2] / "scenarios" / "dev" / "ac-failure.json"
 FAST = SolverSettings(stage_seconds=(5, 5, 5, 5, 5, 5))
@@ -40,3 +43,29 @@ def test_resolve_cancels_no_more_than_joint_and_never_moves_fewer_people() -> No
     assert resolve.cancellations == joint.cancellations
     assert resolve.people_moved >= joint.people_moved
     assert resolve.cost <= joint.cost
+
+
+def test_resolve_is_given_the_greedy_start_plan_as_its_hint(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen: dict[str, object] = {}
+    real = solve
+
+    def spy(*args: Any, **kwargs: Any) -> SolveResult:
+        seen["hint"] = kwargs.get("hint")
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr("smartcampus.baselines.resolve.solve", spy)
+    problem = load_scenario(DEMO)
+    with EventStore() as store:
+        result = run_scenario(problem, Method.RESOLVE, store, FAST)
+    assert seen["hint"] == greedy(result.problem, based_on_version=result.log_version - 1)
+    assert result.start_plan_seconds <= result.planning_seconds
+
+
+def test_a_hinted_resolve_never_cancels_more_than_greedy() -> None:
+    problem = generate_scenario("small", 75, "building", 1)
+    with EventStore() as g_store, EventStore() as r_store:
+        g = run_scenario(problem, Method.GREEDY, g_store).values
+        r = run_scenario(problem, Method.RESOLVE, r_store, FAST).values
+    assert r.cancellations <= g.cancellations

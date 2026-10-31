@@ -2,12 +2,15 @@
 
 The same CP-SAT model and hard rules as joint, but the minimal-change stages P (people moved),
 D (delay) and S (start shift) are dropped, so only C (cancellations), K (cost) and T (tie-break)
-are optimised. There is no start-plan hint. The total time is the tier's, with the time of the
-dropped stages split between C and K. P, D and S are still computed on the resulting plan.
+are optimised. It gets the same complete greedy start-plan hint as joint (ADR 0010); the hint
+only guides the search, the objective is what defines this comparator. The total time is the
+tier's, with the time of the dropped stages split between C and K.
+P, D and S are still computed on the resulting plan.
 """
 
 from dataclasses import replace
 
+from smartcampus.domain.plan import Plan
 from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.solver.solve import SolveResult, SolverSettings, solve
 
@@ -28,6 +31,10 @@ def resolve_settings(tier: SolverSettings) -> SolverSettings:
 
 
 def resolve_from_scratch(
-    problem: RecoveryProblem, tier: SolverSettings, *, based_on_version: int = 0
+    problem: RecoveryProblem,
+    tier: SolverSettings,
+    *,
+    based_on_version: int = 0,
+    hint: Plan | None = None,
 ) -> SolveResult:
-    return solve(problem, resolve_settings(tier), based_on_version=based_on_version)
+    return solve(problem, resolve_settings(tier), based_on_version=based_on_version, hint=hint)
