@@ -106,6 +106,11 @@
 
 - Contract-net subset check (not a result; 14 frozen instances: 6 small, 4 medium, 4 large; greedy and contract_net; commit a7f4f75; files in gitignored `var/cn-out/`) - 2026-10-30: plan on 28 of 28. Contract-net was better than greedy on 9, equal on 5, worse on none (lexicographic). It hit its time cap on 5 (large-l90-building-s1 180 s, medium-l75-building-s1 and medium-l90-hold-s1 90 s, small-l75-building-s1 and small-l90-building-s1 30 s). Largest gain: large-l90-building-s1 cancellations 5 to 1. Median time 28.8 s against greedy 6.0 s. Joint not run on the subset
 
+- Large one-seed-per-cell check (not a result; `docs/results/large-check-2026-10-31.md`, CSV beside it) - 2026-10-31
+  - 9 large seed-2 instances: greedy and joint plan on 9 of 9 (joint 46 to 402 s, slowest `large-l90-building-s2`); resolve, sequential, contract_net on the 3 load-90 ones (status plan on all)
+  - Found: resolve cancels 289 of 289 (building) and 128 (room) while status is `plan`; contract_net on `l90-building` hit its 180 s cap before greedy's own 192 s auction ended, so C104 against greedy C0
+  - Open: contract-net cap on large; how to count and whether to hint resolve on large. Decisions asked of the user via Claude desktop
+
 ## In progress
 
 - Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).

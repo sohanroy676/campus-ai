@@ -43,3 +43,6 @@ Work is on `feature/frozen-grid` (from `main` d179f78), pushed to `origin/featur
 
 ## Next step
 Decision (ADR 0007): implement everything first, run the full evaluation once at the end. Order: (repair-overrun loop, approval triggers, contract-net and eval stamping: done on `feature/recovery-loop`, local); one-seed-per-cell check (27 instances); optional results page; freeze, then the full run. ITC 2019 loader only if the user has the data files. Possible: greedy and resolve times on large; speed up R2/R1 `check`. Push and PR only with approval; watch CI with Monitor (include the secrets job).
+
+## Large check (2026-10-31)
+- One seed per cell on large done (`docs/results/large-check-2026-10-31.md`): no joint or greedy no-plan. Two open issues before the freeze: (1) contract-net's cap (tier total) is shorter than greedy's own first auction on `large-l90-building-s2` (192 s against 180 s), so it ends worse than greedy; (2) resolve returns cancel-everything or heavy-cancel plans on large with status `plan`. Both await the user's decision. Joint takes up to 402 s on large, so the 24 to 36 hour estimate is probably low.
