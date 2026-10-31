@@ -1,0 +1,15 @@
+Scenario:   scenarios\dev\ac-cascade.json
+Follow-ups: scenarios\dev\ac-cascade-overrun.json
+Round 1 at Tue 08:00: 1 fault(s), 0 hold(s); recovery window Tue 08:00 to Tue 18:00; 3 class(es) to recover
+  data-lecture: unchanged (Lec-A1 Tue 13:00)
+  ml-lab: AI-Lab-01 Tue 10:00 -> AI-Lab-02 Tue 09:00
+  net-lab: unchanged (AI-Lab-02 Tue 10:00)
+  equipment: 3 x gpu-01 -> ml-lab, carried Tue 08:30 to Tue 09:00
+  Approval triggers: none; approval: not_needed; plan status: applied
+  Score: cancellations 0 | people moved 26 | delay (min) 0 | cost 30 | start shift (min) 60 | tie-break 1
+Round 2 at Tue 12:00: 1 fault(s), 0 hold(s); recovery window Tue 12:00 to Tue 18:00; 2 class(es) to recover
+  data-lecture: unchanged (Lec-A1 Tue 13:00)
+  robotics-lab: AI-Lab-01 Tue 14:00 -> AI-Lab-02 Tue 14:00
+  Approval triggers: none; approval: not_needed; plan status: applied
+  Score: cancellations 0 | people moved 21 | delay (min) 0 | cost 0 | start shift (min) 0 | tie-break 1
+Event log: 4 event(s) in var\c.db

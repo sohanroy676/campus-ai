@@ -15,10 +15,10 @@ from smartcampus.generator.synth import GENERATOR_VERSION, generate_scenario
 
 FROZEN = Path(__file__).parents[2] / "scenarios" / "frozen"
 
-SIZES = ("small", "medium")
+SIZES = ("small", "medium", "large")
 LOADS = (50, 75, 90)
 SEVERITIES = ("room", "building", "hold")
-SEEDS = tuple(range(1, 16))  # large joins when its time tier is measured (135 per size)
+SEEDS = tuple(range(1, 16))  # 135 per size, 405 in all
 
 EXPECTED = sorted(
     f"{size}-l{load}-{severity}-s{seed}.json"
@@ -27,6 +27,7 @@ EXPECTED = sorted(
 
 
 def test_frozen_set_holds_exactly_the_agreed_grid() -> None:
+    assert len(EXPECTED) == 405
     assert sorted(p.name for p in FROZEN.glob("*.json")) == EXPECTED
 
 

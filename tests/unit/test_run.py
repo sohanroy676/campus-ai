@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from builders import at, evolve, make_activity, make_problem
 
+from smartcampus.baselines.resolve import resolve_settings
 from smartcampus.coordinator.run import Method, run_scenario, seed_disruptions
 from smartcampus.domain.entities import Fault, SafetyHold
 from smartcampus.domain.events import FaultOccurred, PlanApplied, SafetyHoldPlaced
@@ -49,12 +50,19 @@ def test_the_problem_is_rebuilt_from_the_log_without_loss(method: Method) -> Non
         assert run_scenario(problem, method, store, FAST).problem == problem
 
 
-def test_only_the_joint_method_reports_stages_and_settings() -> None:
+def test_only_the_solver_methods_report_stages_and_settings() -> None:
     with EventStore() as joint_store, EventStore() as greedy_store:
         joint = run_scenario(disrupted(), Method.JOINT, joint_store, FAST)
         greedy = run_scenario(disrupted(), Method.GREEDY, greedy_store)
     assert len(joint.stages) == 6 and joint.settings == FAST
     assert greedy.stages == () and greedy.settings is None
+
+
+def test_resolve_reports_only_the_stages_it_runs() -> None:
+    with EventStore() as store:
+        result = run_scenario(disrupted(), Method.RESOLVE, store, FAST)
+    assert [s.name for s in result.stages] == ["cancellations", "cost", "tie_break"]
+    assert result.settings == resolve_settings(FAST)
 
 
 def test_a_scenario_without_disruptions_plans_against_an_empty_log() -> None:

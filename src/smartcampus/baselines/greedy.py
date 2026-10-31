@@ -8,27 +8,14 @@ A class with no valid placement is cancelled. The baseline never looks ahead: an
 take the only room a later class needed.
 """
 
+from smartcampus.agents.equipment import propose_moves
+from smartcampus.agents.resource import bid_cost
 from smartcampus.domain.entities import Activity, Room
 from smartcampus.domain.plan import Assignment, EquipmentMove, Plan
 from smartcampus.domain.problem import RecoveryProblem
-from smartcampus.rules._shared import (
-    Placement,
-    counts_as_moved_in,
-    earliest_borrow_start,
-    move_minutes,
-    remaining_equipment_need,
-    valid_starts,
-)
+from smartcampus.rules._shared import valid_starts
 from smartcampus.rules.validator import validate
 from smartcampus.solver.explain import explain_infeasibility
-from smartcampus.solver.objective import (
-    crosses_buildings,
-    delay_minutes,
-    move_cost,
-    people_cost,
-    shift_minutes,
-    tie_break_cost,
-)
 from smartcampus.solver.solve import InfeasibleInputError
 
 type Candidate = tuple[tuple[int, ...], Room, int, tuple[EquipmentMove, ...]]
@@ -75,58 +62,10 @@ def _candidates(problem: RecoveryProblem, activity: Activity) -> list[Candidate]
     out: list[Candidate] = []
     for room in sorted(problem.campus.rooms, key=lambda r: r.id):
         for start in valid_starts(problem, activity):
-            new_moves = _moves_for(problem, activity, room, start)
+            new_moves = propose_moves(problem, activity, room, start)
             if new_moves is None:
                 continue
-            cost = (
-                people_cost(problem, activity, room.id, start),
-                delay_minutes(activity, start),
-                sum(
-                    move_cost(problem, problem.campus.pool(m.pool_id), m.units, room.id)
-                    for m in new_moves
-                ),
-                shift_minutes(activity, start),
-                tie_break_cost(problem, activity, room.id, start),
+            out.append(
+                (bid_cost(problem, activity, room, start, new_moves), room, start, new_moves)
             )
-            out.append((cost, room, start, new_moves))
     return sorted(out, key=lambda c: (c[0], c[1].id, c[2]))
-
-
-def _moves_for(
-    problem: RecoveryProblem, activity: Activity, room: Room, start: int
-) -> tuple[EquipmentMove, ...] | None:
-    """Moves that bring the missing equipment to `room` just before `start`; None if impossible."""
-    placement = Placement(activity, room, start)
-    moves: list[EquipmentMove] = []
-    for equipment_type, missing in sorted(remaining_equipment_need(problem, placement).items()):
-        pools = sorted(
-            (
-                p
-                for p in problem.campus.pools
-                if p.movable and counts_as_moved_in(p, equipment_type, room.id)
-            ),
-            key=lambda p: (crosses_buildings(problem, p, room.id), p.move_minutes_per_unit, p.id),
-        )
-        for pool in pools:
-            if missing == 0:
-                break
-            units = min(missing, pool.units)
-            move_start = start - move_minutes(pool, units)
-            hold_ends = earliest_borrow_start(problem, pool.id, placement.end)
-            if move_start < problem.plan_time_min or (
-                hold_ends is not None and move_start < hold_ends
-            ):
-                continue
-            moves.append(
-                EquipmentMove(
-                    pool_id=pool.id,
-                    activity_id=activity.id,
-                    units=units,
-                    start_min=move_start,
-                    end_min=start,
-                )
-            )
-            missing -= units
-        if missing:
-            return None
-    return tuple(moves)

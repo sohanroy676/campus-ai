@@ -4,6 +4,7 @@ After each stage its optimum is fixed as a constraint ("stage value <= optimum")
 stage runs. A stage that hits its time limit keeps the best solution it found.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -22,6 +23,10 @@ from smartcampus.solver.objective import StageValues, evaluate, stage_expression
 STAGE_NAMES = ("cancellations", "people_moved", "delay", "cost", "start_shift", "tie_break")
 
 MEDIUM_STAGE_SECONDS = (30.0, 30.0, 9.0, 9.0, 6.0, 6.0)
+LARGE_STAGE_SECONDS = (60.0, 60.0, 18.0, 18.0, 12.0, 12.0)
+
+# Longest the hint completion may take; it runs before stage 1 and is not part of the stage budget.
+HINT_COMPLETION_SECONDS = 10.0
 
 
 @dataclass(frozen=True)
@@ -31,11 +36,14 @@ class SolverSettings:
     stage_seconds: tuple[float, float, float, float, float, float] = (10, 10, 3, 3, 2, 2)
     num_workers: int = 1
     random_seed: int = 42
+    skip_stages: frozenset[int] = frozenset()  # stage indexes left out of the lexicographic order
 
     @classmethod
     def for_problem(cls, problem: RecoveryProblem) -> "SolverSettings":
-        """The time tier for the problem's size: small keeps the default, others get 3x (spec 5)."""
+        """The time tier for the problem's size: small 30 s, medium 90 s, large 180 s (spec 5)."""
         size = problem.provenance.size if problem.provenance else "small"
+        if size == "large":
+            return cls(stage_seconds=LARGE_STAGE_SECONDS)
         return cls() if size == "small" else cls(stage_seconds=MEDIUM_STAGE_SECONDS)
 
 
@@ -78,17 +86,25 @@ def solve(
     *,
     based_on_version: int = 0,
     hint: Plan | None = None,
+    restrict: Callable[[DecisionVars], None] | None = None,
 ) -> SolveResult:
-    """`hint` is a plan to start the search from; without one it starts from cancel-everything."""
+    """`hint` is a plan to start the search from; without one it starts from cancel-everything.
+
+    `restrict` may fix or forbid decision variables after the rules are posted (the sequential
+    baseline uses it to hold earlier passes fixed); it must not encode any rule.
+    """
     settings = settings or SolverSettings()
     ctx = build_variables(problem)
     for rule in ALL_RULES:
         rule.post(ctx)
         ctx.model.add(ctx.rule_lit[rule.id] == 1)
+    if restrict is not None:
+        restrict(ctx)
     if hint is None:
         _hint_cancel_everything(ctx)
     else:
         _hint_plan(ctx, hint)
+    _complete_hint(ctx, settings)
 
     solver = cp_model.CpSolver()
     solver.parameters.num_workers = settings.num_workers
@@ -96,6 +112,8 @@ def solve(
     reports: list[StageReport] = []
     best: Plan | None = None
     for index, (name, seconds) in enumerate(zip(STAGE_NAMES, settings.stage_seconds, strict=True)):
+        if index in settings.skip_stages:
+            continue
         expression = stage_expression(ctx, index)  # its helper variables join the model only now
         ctx.model.minimize(expression)
         solver.parameters.max_time_in_seconds = seconds
@@ -113,7 +131,7 @@ def solve(
         value = round(solver.objective_value)
         ctx.model.add(expression <= value)
         best = _extract_plan(ctx, solver, based_on_version)
-        _hint_solution(ctx, solver)
+        _set_hint(ctx, solver)
         stage_status = StageStatus.OPTIMAL if status == cp_model.OPTIMAL else StageStatus.TIME_LIMIT
         reports.append(StageReport(name, value, stage_status, solver.wall_time))
     assert best is not None
@@ -154,10 +172,31 @@ def _hint_plan(ctx: DecisionVars, plan: Plan) -> None:
         ctx.model.add_hint(var, values[var.index])
 
 
-def _hint_solution(ctx: DecisionVars, solver: cp_model.CpSolver) -> None:
+def _complete_hint(ctx: DecisionVars, settings: SolverSettings) -> None:
+    """Extend the hint to every variable of the model, helper literals included.
+
+    The hint covers only the decision variables; CP-SAT cannot always finish it, and then a valid
+    start plan gives no first solution (medium-l90-room-s3: none in 30 s). Fixing the hinted
+    variables and solving a copy of the model yields values for all the others. If the copy has no
+    solution within the limit, the partial hint is kept.
+    """
+    probe = ctx.model.clone()
+    solver = cp_model.CpSolver()
+    solver.parameters.num_workers = settings.num_workers
+    solver.parameters.random_seed = settings.random_seed
+    solver.parameters.max_time_in_seconds = HINT_COMPLETION_SECONDS
+    solver.parameters.fix_variables_to_their_hinted_value = True
+    if solver.solve(probe) in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        _set_hint(ctx, solver)
+
+
+def _set_hint(ctx: DecisionVars, solver: cp_model.CpSolver) -> None:
+    """Hint every variable that existed when `solver` last solved, with its value there."""
     ctx.model.clear_hints()  # type: ignore[no-untyped-call]  # ortools ships no annotation
-    for var in _all_variables(ctx):
-        ctx.model.add_hint(var, solver.value(var))
+    values = solver.response_proto.solution
+    hint = ctx.model.proto.solution_hint
+    hint.vars.extend(range(len(values)))
+    hint.values.extend(values)
 
 
 def _extract_plan(ctx: DecisionVars, solver: cp_model.CpSolver, version: int) -> Plan:

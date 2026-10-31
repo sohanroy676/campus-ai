@@ -81,14 +81,42 @@
   - Times: small greedy median 0.9 s (max 23.3), joint median 2.1 s (max 31.6); medium greedy median 2.8 s (max 184.7), joint median 23.0 s (max 95.9)
   - Each no-plan ended after 32.4 to 33.9 s (about the 30 s first stage plus build); cause not verified. No per-load tier added. Results in `docs/results/frozen-joint-check-2026-10-30.md` and `.csv`
 
+- Hint fix, large tier, baselines and eval harness on `feature/frozen-grid` (commits abfb433, dfc15db, 2177c64, bc5c265, c6e7ced; local, not pushed) — 2026-10-30
+  - Medium no-plans: the hint covered 63k of 88k variables, so CP-SAT found no first solution in 30 s; `_complete_hint` fixes it. All 11 former no-plans return a plan on the medium tier; the two large seed-1 failures too. `docs/results/medium-no-plan-diagnosis-2026-10-30.md`, ADR 0006
+  - Large tier 60/60/18/18/12/12 s (pilot on seeds 101 to 103 plus seed 1: plan on 5 of 5 on both tiers; the longer tier lowers people moved on 3 of 5). 135 large scenarios frozen: `scenarios/frozen/` = 405 files (47 MB of large JSON)
+  - Baselines: `baselines/resolve.py` (P, D, S dropped, freed time to C and K, no hint) and `baselines/sequential.py` (rooms, equipment, timing as restricted solves); `Method.RESOLVE`, `Method.SEQUENTIAL`; spec section 9
+  - Eval: `eval/metrics.py`, `harness.py`, `stats.py`, `report.py`; `smartcampus eval` (resumable `results.jsonl`, `report.md`) and `compare`; spec section 10. Smoke run on 6 small scenarios x 4 methods: plan on all 24
+  - 989 tests pass (about 8.5 min); `ruff`, `mypy src` pass
+
+- Repair-overrun loop and approval triggers on `feature/recovery-loop` (from `feature/frozen-grid`; local, not pushed) - 2026-10-30
+  - `coordinator/approval.py` (`triggers`), `replan.py` (`replan_problem`: applied plans folded in, plan time = log clock, earlier moves in `prior_moves_this_week`, touched unstarted classes recoverable again), `followups.py`, `loop.py` (`recover`), `run.plan_with_method` (planning step moved out of `run_scenario`, behaviour unchanged)
+  - Approval is a field on `PlanApplied` (`Approval`), not its own event (it would stale the plan); deviation from the plan the user saw, reason in ADR 0008. Spec section 6 extended
+  - CLI `smartcampus cascade <scenario> --followups <file> [--auto-approve/--no-auto-approve]`; demo `scenarios/dev/ac-cascade.json` (the AC demo plus `robotics-lab`) and `ac-cascade-overrun.json`; saved output `docs/results/cascade-demo-2026-10-30.txt`
+  - Tests: `tests/unit/test_approval.py`, `test_loop.py`
+
+- Contract-net on `feature/recovery-loop` (local, not pushed) - 2026-10-30
+  - Spec section 9 (user chose: re-auction with strict whole-plan improvement, 5 rounds plus the tier's wall-clock limit, initial order by original start). `agents/equipment.py` (`propose_moves`, moved out of greedy), `agents/resource.py` (`Bid`, `bid_cost`, `RoomAgent`), `agents/contract_net.py` (`contract_net`); `Method.CONTRACT_NET` ("contract_net"), in the CLI and the eval report order
+  - Extension to the shown definition: a class with no bid may ask the few awarded classes the validator names most often to step aside (displacement), because plain re-bidding cannot rescue a cancelled class; classes without an award go first in each round
+  - Initial auction equals greedy (same order, same costs), so the result is never worse than greedy unless the limit ends the auction early. Seen: small load 90 hold seed 2 cancellations 2 to 1; `small-l75-building-s1` P 2249 to 2101 but still 5 cancellations (joint 2), 30 s limit used
+  - `tests/unit/test_contract_net.py`
+
+- Eval records stamped on `feature/recovery-loop` (local) - 2026-10-30
+  - `RunRecord` gains `commit` (`code_version()`, "+dirty" if tracked files differ), `generator_version`, `stage_seconds`, `num_workers`, `random_seed` (defaults keep older records loadable; greedy has no settings). The report names the code and warns on mixed commits or unstamped runs, and the threats list now includes contract-net's wall-clock limit
+  - Start the final run from a clean tree and an empty `results/` so one commit covers every record
+
+- Contract-net subset check (not a result; 14 frozen instances: 6 small, 4 medium, 4 large; greedy and contract_net; commit a7f4f75; files in gitignored `var/cn-out/`) - 2026-10-30: plan on 28 of 28. Contract-net was better than greedy on 9, equal on 5, worse on none (lexicographic). It hit its time cap on 5 (large-l90-building-s1 180 s, medium-l75-building-s1 and medium-l90-hold-s1 90 s, small-l75-building-s1 and small-l90-building-s1 30 s). Largest gain: large-l90-building-s1 cancellations 5 to 1. Median time 28.8 s against greedy 6.0 s. Joint not run on the subset
+
+- Large one-seed-per-cell check (not a result; `docs/results/large-check-2026-10-31.md`, CSV beside it) - 2026-10-31
+  - 9 large seed-2 instances: greedy and joint plan on 9 of 9 (joint 46 to 402 s, slowest `large-l90-building-s2`); resolve, sequential, contract_net on the 3 load-90 ones (status plan on all)
+  - Found: resolve cancels 289 of 289 (building) and 128 (room) while status is `plan`; contract_net on `l90-building` hit its 180 s cap before greedy's own 192 s auction ended, so C104 against greedy C0
+  - Open: contract-net cap on large; how to count and whether to hint resolve on large. Decisions asked of the user via Claude desktop
+
 ## In progress
 
-- Waiting for the user: how to fill the 405 given the 11 medium no-plans (and whether to re-run one with a solver log first).
-- Large time tier: proposed 60/60/18/18/12/12 s for large, to be tested on the two failing scenarios and seeds 2 and 3 (awaiting the user's go-ahead).
-
+- Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).
 
 ## Next
 
-- Confirm the other spec assumptions in `docs/model-spec.md` section 7.
-- Remaining ROADMAP "Now" item: officer and facilities interviews.
-- v0.3 to v0.5 (ROADMAP "Next"): ITC 2019 loader when the data files exist, repair-overrun re-planning loop (re-run `derive_recovery` on the state), approval triggers, sequential and re-solve baselines, eval harness and stats. Re-solve from scratch is decided: a full joint solve ignoring the timetable, stages P, D, S dropped, C, K, T kept, no hint, same total budget as the tier with the freed time given to C and K; P, D, S still computed on its plan.
+- Contract-net; then the one-seed-per-cell check, then (code frozen) the full evaluation run, results and stats into `docs/results/`; report plan rate per method and per size, the paired Wilcoxon on instances both solved, and the sensitivity view.
+- Officer and facilities interviews (ROADMAP "Now").
+- ITC 2019 loader when the data files exist; repair-overrun re-planning loop, approval triggers, contract-net (v0.3 to v0.5).

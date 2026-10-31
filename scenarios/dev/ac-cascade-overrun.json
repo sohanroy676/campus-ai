@@ -1,0 +1,8 @@
+[
+  {
+    "type": "repair_overrun",
+    "at_min": 2160,
+    "fault_id": "ac-failure-lab01",
+    "new_end_min": 2400
+  }
+]

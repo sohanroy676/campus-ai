@@ -52,6 +52,11 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 plugins = ["pydantic.mypy"]
 
+# scipy ships no type stubs.
+[[tool.mypy.overrides]]
+module = ["scipy.*"]
+ignore_missing_imports = true
+
 # mypy does not accept `strict = true` per module, so the strict flags are listed explicitly.
 [[tool.mypy.overrides]]
 module = ["smartcampus.rules.*", "smartcampus.solver.*", "smartcampus.sim.*"]
