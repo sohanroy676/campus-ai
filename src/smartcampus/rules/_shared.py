@@ -5,6 +5,7 @@ Each rule's meaning is written once here or in its own module; `check` and `post
 
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import cached_property
 from typing import overload
 
 from ortools.sat.python import cp_model
@@ -36,11 +37,11 @@ class Placement:
     start: int
     var: cp_model.IntVar | None = None
 
-    @property
+    @cached_property
     def end(self) -> int:
         return self.start + self.activity.duration_min
 
-    @property
+    @cached_property
     def slots(self) -> range:
         first = minute_to_slot(self.start)
         return range(first, first + self.activity.duration_slots)
@@ -62,13 +63,26 @@ def valid_starts(problem: RecoveryProblem, activity: Activity) -> list[int]:
     return starts
 
 
+_last_fixed: tuple[RecoveryProblem, list[Placement]] | None = None
+
+
 def fixed_placements(problem: RecoveryProblem) -> list[Placement]:
-    """Activities outside the recovery set stay where they were originally planned."""
-    return [
+    """Activities outside the recovery set stay where they were originally planned.
+
+    The list depends only on the problem (immutable), and a check asks for it again for every plan
+    it validates, so the last problem's list is kept (compared by identity). Callers must not
+    modify the returned list.
+    """
+    global _last_fixed
+    if _last_fixed is not None and _last_fixed[0] is problem:
+        return _last_fixed[1]
+    built = [
         Placement(a, problem.campus.room(a.room_id), a.start_min)
         for a in problem.activities
         if a.id not in problem.movable_activity_ids
     ]
+    _last_fixed = (problem, built)
+    return built
 
 
 def plan_placements(problem: RecoveryProblem, plan: Plan) -> list[Placement]:
