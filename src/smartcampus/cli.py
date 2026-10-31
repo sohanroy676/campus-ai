@@ -1,4 +1,4 @@
-"""Typer entry point: generate, run, compare, eval."""
+"""Typer entry point: generate, run, cascade, compare, demo, eval."""
 
 from pathlib import Path
 from typing import Annotated
@@ -160,6 +160,40 @@ def compare(
             f"{r.method:<11} {v.cancellations} {v.people_moved} {v.delay} {v.cost} "
             f"{v.start_shift} {v.tie_break}   {r.seconds:.1f}"
         )
+
+
+@app.command()
+def demo(
+    scenario: Annotated[str, typer.Option(help="Demo scenario to start with.")] = "ac-failure",
+    host: Annotated[str, typer.Option(help="Address to listen on.")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port to listen on.")] = 8000,
+) -> None:
+    """Serve the live demo dashboard: inject an incident, watch the agents plan, apply a plan.
+
+    Needs the `api` extra (`uv sync --extra api`). Runs offline; no LLM is used.
+
+    Exit codes: 0 stopped; 2 unknown scenario or the `api` extra is missing.
+    """
+    try:
+        import uvicorn
+
+        from smartcampus.api.app import create_app
+        from smartcampus.api.demo import SCENARIOS
+    except ImportError as error:
+        typer.echo(
+            f"smartcampus demo: {error.name} is missing; install it with `uv sync --extra api`",
+            err=True,
+        )
+        raise typer.Exit(code=2) from error
+    if scenario not in SCENARIOS:
+        typer.echo(
+            f"smartcampus demo: unknown scenario {scenario!r}; choose from: "
+            + ", ".join(SCENARIOS),
+            err=True,
+        )
+        raise typer.Exit(code=2)
+    typer.echo(f"Dashboard: http://{host}:{port}/  (Ctrl+C to stop)")
+    uvicorn.run(create_app(scenario), host=host, port=port, log_level="warning")
 
 
 @app.command(name="eval")
