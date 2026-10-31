@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from enum import StrEnum
 
-from smartcampus.agents.contract_net import contract_net
+from smartcampus.agents.contract_net import run_contract_net
 from smartcampus.baselines.greedy import greedy
 from smartcampus.baselines.resolve import resolve_from_scratch, resolve_settings
 from smartcampus.baselines.sequential import sequential
@@ -14,7 +14,7 @@ from smartcampus.domain.problem import RecoveryProblem
 from smartcampus.rules.validator import assert_valid
 from smartcampus.sim.store import EventStore
 from smartcampus.solver.objective import StageValues, evaluate
-from smartcampus.solver.solve import SolverSettings, StageReport, solve
+from smartcampus.solver.solve import SolverSettings, StageReport, StageStatus, solve
 
 
 class Method(StrEnum):
@@ -35,7 +35,8 @@ class RunResult:
     settings: SolverSettings | None  # None for methods without solver settings
     log_version: int  # events in the log after the plan was applied
     planning_seconds: float = 0.0  # wall time to build the plan, start plan included
-    start_plan_seconds: float = 0.0  # of which the greedy start plan (joint only)
+    start_plan_seconds: float = 0.0  # of which the start plan (joint, resolve, contract-net)
+    limit_hit: bool = False  # a solver stage or the re-auction rounds stopped at a time limit
 
 
 def seed_disruptions(store: EventStore, problem: RecoveryProblem) -> None:
@@ -56,6 +57,7 @@ class Planned:
     settings: SolverSettings | None
     planning_seconds: float
     start_plan_seconds: float
+    limit_hit: bool = False
 
 
 def plan_with_method(
@@ -69,6 +71,7 @@ def plan_with_method(
     start_plan_seconds = 0.0
     stages: tuple[StageReport, ...] = ()
     used_settings: SolverSettings | None = None
+    limit_hit = False
     if method is Method.JOINT:
         used_settings = settings or SolverSettings.for_problem(current)
         # The greedy plan is complete, so the search starts from a plan instead of from nothing.
@@ -79,7 +82,9 @@ def plan_with_method(
     elif method is Method.RESOLVE:
         tier = settings or SolverSettings.for_problem(current)
         used_settings = resolve_settings(tier)
-        solved = resolve_from_scratch(current, tier, based_on_version=version)
+        start = greedy(current, based_on_version=version)  # same hint as joint (ADR 0010)
+        start_plan_seconds = time.monotonic() - started
+        solved = resolve_from_scratch(current, tier, based_on_version=version, hint=start)
         plan, stages = solved.plan, solved.stages
     elif method is Method.SEQUENTIAL:
         used_settings = settings or SolverSettings.for_problem(current)
@@ -87,14 +92,20 @@ def plan_with_method(
         plan, stages = solved.plan, solved.stages
     elif method is Method.CONTRACT_NET:
         used_settings = settings or SolverSettings.for_problem(current)
-        limit = sum(used_settings.stage_seconds)  # the tier's total, as for the solver methods
-        plan = contract_net(current, time_limit_seconds=limit, based_on_version=version)
+        limit = sum(used_settings.stage_seconds)  # the tier's total, after the first auction
+        auction = run_contract_net(current, time_limit_seconds=limit, based_on_version=version)
+        plan, start_plan_seconds, limit_hit = (
+            auction.plan,
+            auction.start_plan_seconds,
+            auction.limit_hit,
+        )
     else:
         plan = greedy(current, based_on_version=version)
 
     planning_seconds = time.monotonic() - started
     assert_valid(current, plan)  # independent re-check with the shared rule library
-    return Planned(plan, stages, used_settings, planning_seconds, start_plan_seconds)
+    limit_hit = limit_hit or any(s.status is StageStatus.TIME_LIMIT for s in stages)
+    return Planned(plan, stages, used_settings, planning_seconds, start_plan_seconds, limit_hit)
 
 
 def run_scenario(
@@ -125,4 +136,5 @@ def run_scenario(
         log_version=store.version,
         planning_seconds=planned.planning_seconds,
         start_plan_seconds=planned.start_plan_seconds,
+        limit_hit=planned.limit_hit,
     )

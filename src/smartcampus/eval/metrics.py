@@ -33,6 +33,11 @@ class RunRecord:
     stage_seconds: list[float] = field(default_factory=list)  # solver tier; empty for greedy
     num_workers: int = 0  # 0 for methods without solver settings
     random_seed: int = 0
+    # Did the method stop at a time limit (a solver stage, or contract-net's re-auction rounds)?
+    limit_hit: bool = False
+    # Is the final plan no better than the greedy start plan (lexicographic)? Greedy is its own
+    # start plan, so it counts; a run without a plan does not.
+    start_unimproved: bool = False
 
     @property
     def solved(self) -> bool:
