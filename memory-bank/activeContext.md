@@ -3,7 +3,7 @@
 <!-- Update this at the end of every session. This is the first thing to read when resuming. -->
 
 ## Current focus
-Work is on `feature/frozen-grid` (from `main` d179f78), pushed to `origin/feature/generator`; `feature/recovery-loop` was merged into it (fast-forward) and still exists. No PR. Built since the last hand-off: approval triggers, the re-plan loop and `smartcampus cascade` (ADR 0008), contract-net (spec section 9), and stamped eval records. 1043 tests pass (about 9.5 min); ruff and mypy clean. Merged feature branches still exist; do not delete them. All five methods exist; the evidence run is not started (ADR 0007). The remaining cheap check is one seed per grid cell; see `memory-bank/next_session_prompt.md`.
+Branch `feature/freeze-prep` (from `main` 0501b34, CI on main green: `checks` and `secrets` seen). The pre-freeze decisions 1 to 9 are implemented (see progress.md); the code is ready to freeze once the user says so. Not done, by design: tag, dry run on `scenarios/smoke/` (item 10), the full 405 run. Do not push or open a PR without approval.
 
 ## Recent decisions
 - The scaffold is merged and pushed (`origin/main` at b56e88c). `feature/project-scaffold` still exists; do not delete it.
@@ -42,7 +42,7 @@ Work is on `feature/frozen-grid` (from `main` d179f78), pushed to `origin/featur
 - Contract-net subset check done (see progress.md): no large or medium no-plans, 5 of 14 runs limit-bound. The one-seed-per-cell check (27 instances, about 2 hours, greedy and joint at least) is the remaining cheap check.
 
 ## Next step
-Decision (ADR 0007): implement everything first, run the full evaluation once at the end. Order: (repair-overrun loop, approval triggers, contract-net and eval stamping: done on `feature/recovery-loop`, local); one-seed-per-cell check (27 instances); optional results page; freeze, then the full run. ITC 2019 loader only if the user has the data files. Possible: greedy and resolve times on large; speed up R2/R1 `check`. Push and PR only with approval; watch CI with Monitor (include the secrets job).
+User says the code is frozen -> tag the commit -> dry run on `scenarios/smoke/` (all methods, report.md, check by eye, kill and resume once, delete the results) -> full run per ADR 0007 (clean tree, empty `results/`, sleep disabled, memory log, one job at a time). Estimate about 20 h, up to 30 h. Optional before: results page, ITC 2019 loader (only with data files), `approve`/`reject` command.
 
 ## Large check (2026-10-31)
 - One seed per cell on large done (`docs/results/large-check-2026-10-31.md`): no joint or greedy no-plan. Two open issues before the freeze: (1) contract-net's cap (tier total) is shorter than greedy's own first auction on `large-l90-building-s2` (192 s against 180 s), so it ends worse than greedy; (2) resolve returns cancel-everything or heavy-cancel plans on large with status `plan`. Both await the user's decision. Joint takes up to 402 s on large, so the 24 to 36 hour estimate is probably low.

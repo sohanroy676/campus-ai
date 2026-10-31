@@ -2,6 +2,9 @@
 
 Continue work on campus-ai (D:\Programming\campus-ai). CLAUDE.md and the memory-bank are loaded. Read this file first, then check `git log` and `git status`.
 
+## Update 2026-10-31 (read first)
+- Work is on `feature/freeze-prep` (local, uncommitted work may remain: check `git status`). Pre-freeze items 1 to 9 are done: ADR 0009 and 0010, records with `limit_hit`/`start_unimproved` and a manifest, report changes, Holm statistics, faster greedy with a golden test, `scenarios/smoke/`, ADR 0007 update. Waiting for the user to say the code is frozen; then tag, dry run, full run (ADR 0007). The 'Open items' below are older than this note.
+
 ## State
 - `main` is d179f78 (CI green; CI runs only for pushes and PRs to `main`). All work since then is on `feature/frozen-grid`, pushed to `origin/feature/generator` (the branch this environment designates). `feature/recovery-loop` was merged into `feature/frozen-grid` (fast-forward) and still exists; do not delete it or any other branch. No PR is open; do not open a PR, merge into `main` or push without approval.
 - Frozen set: all 405 instances in `scenarios/frozen/` (small, medium, large x loads 50/75/90 x room/building/hold x seeds 1 to 15); 20 smoke instances are separate and not counted. Never edit files in `scenarios/frozen/`.
