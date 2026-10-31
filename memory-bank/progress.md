@@ -119,6 +119,11 @@
   - Large re-check (`docs/results/large-recheck-2026-10-31.md`): contract-net C0 on `l90-building` (was C104), resolve C0 on all three (was C289 and C128); contract-net equals greedy on all three
   - ADR 0007 updated: time estimate about 20 h (26 to 30 h if large is everywhere as slow as load 90; the expected "more than 36 h" is not supported by the measurements), run-safety checklist, mid-run bug policy
 
+- Live demo dashboard on `claude/project-thread-ennlph` (PR to main) - 2026-10-31
+  - `api/demo.py` (`DemoSession`: incidents and plans as events in an in-memory log, proposals from `plan_with_method`, agent activity recorded from the real steps), `api/app.py` (FastAPI, one worker thread), `api/static/` (one page, plain JS, offline), CLI `smartcampus demo`
+  - Six panels: Campus Overview, Incident Panel, Agent Activity, Solution Comparison, Updated Campus State, Performance Metrics; scenarios `ac-failure`, `ac-cascade`, `generated-small` (small, load 75, room, seed 2: joint 38 people moved, greedy 109)
+  - ADR 0011, `docs/demo.md`; tests `tests/unit/test_api_demo.py`, `test_api_app.py` (real uvicorn server + urllib; Starlette's TestClient would need another package)
+
 ## In progress
 
 - Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).

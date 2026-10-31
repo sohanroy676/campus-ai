@@ -35,6 +35,7 @@
 - Run one scenario: `uv run smartcampus run scenarios/small-75-room-s1.json --method joint --report out/run.json`
 - Compare methods on one scenario: `uv run smartcampus compare scenarios/small-75-room-s1.json`
 - Evaluate a frozen set: `uv run smartcampus eval scenarios/frozen/ --methods all --out results/`
+- Live demo dashboard: `uv sync --extra api` then `uv run smartcampus demo [--scenario ac-failure|ac-cascade|generated-small] [--port 8000]` (`docs/demo.md`)
 - API (v0.5+): `uv run uvicorn smartcampus.api.app:app --reload --port 8000`
 - Web view (v0.5+): `cd web && npm install && npm run dev`
 
