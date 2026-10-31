@@ -10,16 +10,20 @@ scores strictly better (`evaluate`, lexicographic). A class with no award may al
 classes to step aside, one at a time (the few the validator names most often when it rejects the
 cheapest bids): the class takes its best bid, the displaced class bids again, and the swap stands
 only if the whole plan scores strictly better. Rounds stop when a round changes nothing, after
-`MAX_ROUNDS`, or at the time limit, keeping the best plan so far.
+`MAX_ROUNDS`, or at the time limit, keeping the best plan so far. The time limit covers the
+re-auction rounds only: the initial auction always finishes, so the result is never worse than
+greedy's (ADR 0009).
 
 Agents only propose placements. Rules are checked by `rules.validator`, never in agents, and the
 manager never writes state.
 """
 
 import heapq
+import math
 import time
 from collections import Counter
 from collections.abc import Iterator
+from dataclasses import dataclass
 
 from smartcampus.agents.resource import Bid, RoomAgent
 from smartcampus.domain.entities import Activity
@@ -42,10 +46,10 @@ class _OutOfTime(Exception):
 
 
 class _Manager:
-    def __init__(self, problem: RecoveryProblem, version: int, deadline: float) -> None:
+    def __init__(self, problem: RecoveryProblem, version: int) -> None:
         self.problem = problem
         self.version = version
-        self.deadline = deadline
+        self.deadline = math.inf  # set once the initial auction is done
         self.agents = [RoomAgent(r) for r in sorted(problem.campus.rooms, key=lambda r: r.id)]
         self.order = sorted(
             (problem.activity(a) for a in problem.movable_activity_ids),
@@ -126,20 +130,43 @@ class _Manager:
         return trial if again is None else {**trial, other.id: again}
 
 
-def contract_net(
+@dataclass(frozen=True)
+class AuctionResult:
+    plan: Plan
+    start_plan: Plan  # the initial auction's plan (what greedy would return)
+    start_plan_seconds: float  # wall time of the initial auction
+    limit_hit: bool  # the re-auction rounds were cut off by the time limit
+
+
+def run_contract_net(
     problem: RecoveryProblem, *, time_limit_seconds: float, based_on_version: int = 0
-) -> Plan:
+) -> AuctionResult:
     """A valid plan, or `InfeasibleInputError` if the input already breaks a hard rule.
 
-    At the time limit the awards made so far are returned, the rest cancelled.
+    The initial auction has no time limit. `time_limit_seconds` starts after it and bounds the
+    re-auction rounds; at the limit the awards made so far are returned, the rest cancelled.
     """
-    manager = _Manager(problem, based_on_version, time.monotonic() + time_limit_seconds)
+    started = time.monotonic()
+    manager = _Manager(problem, based_on_version)
+    manager.auction()
+    start_plan = manager.plan(manager.awards)
+    start_plan_seconds = time.monotonic() - started
+    manager.deadline = time.monotonic() + time_limit_seconds
+    limit_hit = False
     try:
-        manager.auction()
         manager.rounds()
     except _OutOfTime:
-        pass
+        limit_hit = True
     plan = manager.plan(manager.awards)
     if validate(problem, plan):
         raise InfeasibleInputError(explain_infeasibility(problem))
-    return plan
+    return AuctionResult(plan, start_plan, start_plan_seconds, limit_hit)
+
+
+def contract_net(
+    problem: RecoveryProblem, *, time_limit_seconds: float, based_on_version: int = 0
+) -> Plan:
+    """The plan of `run_contract_net`."""
+    return run_contract_net(
+        problem, time_limit_seconds=time_limit_seconds, based_on_version=based_on_version
+    ).plan
