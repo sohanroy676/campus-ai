@@ -16,7 +16,7 @@ def test_package_exposes_version() -> None:
 def test_help_lists_all_commands() -> None:
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    for command in ("generate", "run", "compare", "eval"):
+    for command in ("generate", "run", "compare", "demo", "eval"):
         assert command in result.output
 
 
@@ -46,3 +46,9 @@ def test_eval_writes_a_report_and_rejects_a_pattern_with_no_match(tmp_path: Path
     none = runner.invoke(app, [*args, "--pattern", "zzz*.json"])
     assert none.exit_code == 2
     assert runner.invoke(app, ["eval", str(scenarios), "--methods", "x"]).exit_code == 2
+
+
+def test_demo_refuses_an_unknown_scenario() -> None:
+    result = runner.invoke(app, ["demo", "--scenario", "no-such-campus"])
+    assert result.exit_code == 2
+    assert "ac-failure" in result.output

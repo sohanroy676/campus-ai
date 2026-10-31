@@ -41,6 +41,9 @@ Branch `feature/freeze-prep` (from `main` 0501b34, CI on main green: `checks` an
 
 - Contract-net subset check done (see progress.md): no large or medium no-plans, 5 of 14 runs limit-bound. The one-seed-per-cell check (27 instances, about 2 hours, greedy and joint at least) is the remaining cheap check.
 
+## Demo dashboard (2026-10-31)
+- `smartcampus demo` serves the live dashboard (ADR 0011, `docs/demo.md`). It only reads the frozen code paths (`plan_with_method`, `replan_problem`, `assess`, validator); no rule logic in `api/`. fastapi and uvicorn are in the dev group too, so CI covers `api/`.
+
 ## Next step
 User says the code is frozen -> tag the commit -> dry run on `scenarios/smoke/` (all methods, report.md, check by eye, kill and resume once, delete the results) -> full run per ADR 0007 (clean tree, empty `results/`, sleep disabled, memory log, one job at a time). Estimate about 20 h, up to 30 h. Optional before: results page, ITC 2019 loader (only with data files), `approve`/`reject` command.
 

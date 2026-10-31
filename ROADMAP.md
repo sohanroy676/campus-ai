@@ -9,7 +9,7 @@
 - Repair-overrun and second-event re-planning loop (the events and stale-plan rejection exist in `sim/`, and `impact/` derives the window and movable set) and approval triggers.
 - Sequential and re-solve baselines and the evaluation harness are done (spec sections 9 and 10). Contract-net is built (spec section 9, `agents/`); the repair-overrun loop and approval triggers too (ADR 0008).
 - Gate 2: all comparators run on the 405-instance frozen v1.0 evaluation set (20 smoke instances are separate and not counted). Progress: all 405 frozen; the full run is deferred until every feature is built (ADR 0007). If not met, the stretch goals are dropped.
-- Results view through FastAPI and a simple React page.
+- Results view through FastAPI and a simple React page. The live demo dashboard is built (`smartcampus demo`, `docs/demo.md`, ADR 0011: static page, no React build); a results view of the full run is still to do.
 
 ## Later ideas (only if Gate 2 passes, or after v1.0)
 - An energy cost term in the objective.

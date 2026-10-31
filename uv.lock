@@ -1,5 +1,5 @@
 version = 1
-revision = 5
+revision = 3
 requires-python = "==3.12.*"
 resolution-markers = [
     "sys_platform == 'win32'",
@@ -948,12 +948,14 @@ llm = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "fastapi" },
     { name = "hypothesis" },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -973,12 +975,14 @@ provides-extras = ["api", "llm"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "fastapi", specifier = ">=0.115" },
     { name = "hypothesis", specifier = ">=6" },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest", specifier = ">=8" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "uvicorn", specifier = ">=0.30" },
 ]
 
 [[package]]

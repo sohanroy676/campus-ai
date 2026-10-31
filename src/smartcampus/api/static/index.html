@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Campus Live Demo</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>Smart Campus</h1>
+      <span class="muted">Live disruption recovery</span>
+    </div>
+    <div class="controls">
+      <label class="field inline">
+        <span>Scenario</span>
+        <select id="scenario"></select>
+      </label>
+      <span class="chip" id="clock" title="Simulation clock">Clock</span>
+      <span class="chip" id="version" title="Events in the digital twin's log">Log v0</span>
+      <button id="reset" class="ghost">Reset</button>
+    </div>
+  </header>
+
+  <ol class="stepper" id="stepper">
+    <li data-step="1">Normal campus</li>
+    <li data-step="2">Incident</li>
+    <li data-step="3">Agents working</li>
+    <li data-step="4">Proposed solutions</li>
+    <li data-step="5">Campus updated</li>
+  </ol>
+
+  <main class="grid">
+    <section class="panel span-8" id="overview">
+      <div class="panel-head">
+        <h2>Campus Overview</h2>
+        <span class="muted" id="scenario-desc"></span>
+      </div>
+      <div class="tiles" id="tiles"></div>
+      <div class="rooms" id="rooms"></div>
+      <div class="day-tabs" id="day-tabs" role="tablist"></div>
+      <div class="timetable" id="timetable-now"></div>
+      <div class="legend">
+        <span><i class="sw sw-class"></i>Class</span>
+        <span><i class="sw sw-hit"></i>Hit by incident</span>
+        <span><i class="sw sw-fault"></i>Room out of use</span>
+        <span><i class="sw sw-moved"></i>Moved</span>
+        <span><i class="sw sw-cancelled"></i>Cancelled</span>
+      </div>
+    </section>
+
+    <section class="panel span-4" id="incident">
+      <div class="panel-head"><h2>Incident Panel</h2></div>
+      <form id="fault-form" class="stack">
+        <label class="field"><span>Room</span><select id="f-room"></select></label>
+        <label class="field"><span>Incident</span><select id="f-kind"></select></label>
+        <div class="row">
+          <label class="field"><span>Day</span><select id="f-day"></select></label>
+          <label class="field"><span>From</span><select id="f-start"></select></label>
+          <label class="field"><span>Until</span><select id="f-end"></select></label>
+        </div>
+        <label class="check"><input type="checkbox" id="auto-plan" checked> Run every planner straight away</label>
+        <button type="submit" class="danger" id="inject">Inject incident</button>
+      </form>
+      <div id="active-incidents"></div>
+      <form id="overrun-form" class="stack hidden">
+        <h3>Repair overrun</h3>
+        <div class="row">
+          <label class="field"><span>Reported at</span><select id="o-at"></select></label>
+          <label class="field"><span>New end</span><select id="o-end"></select></label>
+        </div>
+        <button type="submit" class="ghost">Report overrun and re-plan</button>
+      </form>
+      <div id="impact"></div>
+    </section>
+
+    <section class="panel span-4" id="activity">
+      <div class="panel-head">
+        <h2>Agent Activity</h2>
+        <span class="muted" id="busy"></span>
+      </div>
+      <ol class="feed" id="feed"></ol>
+    </section>
+
+    <section class="panel span-8" id="comparison">
+      <div class="panel-head">
+        <h2>Solution Comparison</h2>
+        <button id="replan" class="ghost" disabled>Run planners</button>
+      </div>
+      <p class="muted small">Lexicographic score, lower is better: cancellations first, then people moved,
+        delay, equipment cost. Every plan is re-checked against hard rules R1 to R8.</p>
+      <div class="table-wrap">
+        <table id="methods">
+          <thead>
+            <tr>
+              <th>Method</th><th class="num">Cancelled</th><th class="num">People moved</th>
+              <th class="num">Delay (min)</th><th class="num">Equip. cost</th>
+              <th class="num">Classes changed</th><th>Approval</th><th class="num">Time (s)</th><th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel span-8" id="updated">
+      <div class="panel-head">
+        <h2>Updated Campus State</h2>
+        <span class="muted" id="updated-label"></span>
+      </div>
+      <div class="timetable" id="timetable-after"></div>
+      <div class="changes" id="changes"></div>
+    </section>
+
+    <section class="panel span-4" id="metrics">
+      <div class="panel-head"><h2>Performance Metrics</h2></div>
+      <div class="tiles small-tiles" id="metric-tiles"></div>
+      <div id="charts"></div>
+      <h3>Event log</h3>
+      <ol class="events" id="events"></ol>
+    </section>
+  </main>
+
+  <div class="toast hidden" id="toast" role="alert"></div>
+  <div class="tooltip hidden" id="tooltip"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
