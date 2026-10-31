@@ -12,6 +12,7 @@ from typing import Any
 
 from smartcampus.coordinator.run import Method, run_scenario
 from smartcampus.domain.problem import RecoveryProblem
+from smartcampus.eval.manifest import check_or_write, current_environment
 from smartcampus.eval.metrics import (
     NO_PLAN,
     PLAN,
@@ -20,6 +21,7 @@ from smartcampus.eval.metrics import (
 )
 from smartcampus.generator.scenario import load_scenario
 from smartcampus.sim.store import EventStore
+from smartcampus.solver.objective import StageValues
 from smartcampus.solver.solve import InfeasibleInputError, NoSolutionError, SolverSettings
 
 RESULTS_FILE = "results.jsonl"
@@ -47,9 +49,18 @@ def code_version() -> str:
 
 
 def run_one(
-    instance: str, problem: RecoveryProblem, method: Method, *, commit: str = ""
+    instance: str,
+    problem: RecoveryProblem,
+    method: Method,
+    *,
+    commit: str = "",
+    start_values: StageValues | None = None,
 ) -> RunRecord:
-    """Run `method` on `problem`; `PlanInvalidError` (a bug) is not caught."""
+    """Run `method` on `problem`; `PlanInvalidError` (a bug) is not caught.
+
+    `start_values` are the greedy plan's values, the start solution every method is compared with
+    for `start_unimproved` (greedy needs none).
+    """
     provenance = problem.provenance
     generator_version = provenance.generator_version if provenance is not None else ""
     size, load, severity, seed = (
@@ -75,6 +86,7 @@ def run_one(
             seconds=0.0,
             start_plan_seconds=0.0,
             reason=f"{type(error).__name__}: {error}",
+            limit_hit=isinstance(error, NoSolutionError),
             commit=commit,
             generator_version=generator_version,
             **_settings_fields(method, problem),
@@ -91,6 +103,9 @@ def run_one(
         imputed=imputed,
         seconds=result.planning_seconds,
         start_plan_seconds=result.start_plan_seconds,
+        limit_hit=result.limit_hit,
+        start_unimproved=method is Method.GREEDY
+        or (start_values is not None and result.values >= start_values),
         commit=commit,
         generator_version=generator_version,
         **_settings_fields(method, problem, result.settings),
@@ -109,6 +124,17 @@ def _settings_fields(
         "num_workers": settings.num_workers,
         "random_seed": settings.random_seed,
     }
+
+
+def _greedy_first(methods: Sequence[Method]) -> list[Method]:
+    return sorted(methods, key=lambda m: m is not Method.GREEDY)
+
+
+def _recorded_greedy_values(instance: str, records: Sequence[RunRecord]) -> StageValues | None:
+    for r in records:
+        if r.instance == instance and r.method == Method.GREEDY.value:
+            return r.values
+    return None
 
 
 def read_results(path: Path) -> list[RunRecord]:
@@ -135,18 +161,27 @@ def run_eval(
     records = read_results(results_path)
     done = {(r.instance, r.method) for r in records}
     commit = code_version()
+    check_or_write(out, commit, current_environment())
     wanted = {p.stem for p in paths}
     with results_path.open("a", encoding="utf-8", newline="\n") as results:
         for path in paths:
-            todo = [m for m in methods if (path.stem, m.value) not in done]
+            # greedy first: its values are the start solution the others are compared with
+            todo = [m for m in _greedy_first(methods) if (path.stem, m.value) not in done]
             if not todo:
                 continue
             problem = load_scenario(path)
+            start_values = _recorded_greedy_values(path.stem, records)
+            if start_values is None and Method.GREEDY not in todo:
+                start_values = run_one(path.stem, problem, Method.GREEDY, commit=commit).values
             for method in todo:
-                record = run_one(path.stem, problem, method, commit=commit)
+                record = run_one(
+                    path.stem, problem, method, commit=commit, start_values=start_values
+                )
                 results.write(record.to_json() + "\n")
                 results.flush()
                 records.append(record)
+                if method is Method.GREEDY:
+                    start_values = record.values
                 if progress is not None:
                     progress(f"{path.stem} {method.value}: {record.status} {record.seconds:.1f}s")
     wanted_methods = {m.value for m in methods}

@@ -76,3 +76,4 @@ extra_checks = true
 testpaths = ["tests"]
 pythonpath = ["tests", "tests/property"]
 addopts = "--strict-markers"
+markers = ["slow: takes minutes (large instances); leave out with -m \"not slow\""]

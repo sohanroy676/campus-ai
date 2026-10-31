@@ -1,7 +1,7 @@
 import pytest
 from builders import at, evolve, make_activity, make_problem
 
-from smartcampus.agents.contract_net import contract_net
+from smartcampus.agents.contract_net import contract_net, run_contract_net
 from smartcampus.agents.resource import Bid, RoomAgent
 from smartcampus.baselines.greedy import greedy
 from smartcampus.coordinator.run import seed_disruptions
@@ -51,11 +51,32 @@ def test_a_class_that_fits_nowhere_is_cancelled() -> None:
     assert plan.cancelled == frozenset({"act1"}) and plan.assignments == ()
 
 
-def test_no_time_left_gives_a_valid_plan_that_cancels_what_was_not_awarded() -> None:
+def test_no_time_left_still_runs_the_whole_first_auction_and_returns_greedys_plan() -> None:
     problem = evolve(make_problem(), faults=closed("A1"))
-    plan = contract_net(problem, time_limit_seconds=0.0)
-    assert validate(problem, plan) == []
-    assert plan.cancelled == frozenset({"act1"})
+    result = run_contract_net(problem, time_limit_seconds=0.0)
+    assert validate(problem, result.plan) == []
+    assert result.start_plan == greedy(problem)
+    assert result.plan.cancelled == frozenset()  # the limit starts after the first auction
+    assert result.limit_hit  # the re-auction rounds were cut off at once
+
+
+def test_a_generous_limit_is_not_hit_and_the_start_plan_is_kept_when_nothing_improves() -> None:
+    problem = make_problem()
+    result = run_contract_net(problem, time_limit_seconds=LIMIT)
+    assert not result.limit_hit
+    assert result.plan == result.start_plan
+    assert result.start_plan_seconds >= 0.0
+
+
+def test_the_limit_does_not_count_the_time_of_a_slow_first_auction(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    clock = iter(range(0, 10_000, 100))  # every reading of the clock is 100 s later
+    monkeypatch.setattr("smartcampus.agents.contract_net.time.monotonic", lambda: next(clock))
+    problem = evolve(make_problem(), faults=closed("A1"))
+    result = run_contract_net(problem, time_limit_seconds=1.0)
+    assert result.start_plan == greedy(problem)
+    assert result.start_plan_seconds >= 100.0
 
 
 def test_no_classes_to_recover_gives_an_empty_plan() -> None:

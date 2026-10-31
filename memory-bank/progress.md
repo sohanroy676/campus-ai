@@ -111,6 +111,14 @@
   - Found: resolve cancels 289 of 289 (building) and 128 (room) while status is `plan`; contract_net on `l90-building` hit its 180 s cap before greedy's own 192 s auction ended, so C104 against greedy C0
   - Open: contract-net cap on large; how to count and whether to hint resolve on large. Decisions asked of the user via Claude desktop
 
+- Pre-freeze changes on `feature/freeze-prep` (from main 0501b34; local, not pushed) - 2026-10-31
+  - ADR 0009: contract-net's wall-clock limit (30/90/180 s) starts after its first auction (`run_contract_net`, `AuctionResult`); ADR 0010: resolve gets the greedy start-plan hint. Spec 5, 9, 10 updated
+  - Records: `limit_hit`, `start_unimproved` (vs the greedy plan, greedy runs first per instance); `eval/manifest.py` writes `manifest.json` (commit, CPU, OS, Python, OR-Tools, NumPy, SciPy) and refuses a resume under another commit/environment. Report: counts per method and size, wall time beside stage seconds, primary (joint vs sequential on C and P, Holm over the two) and secondary (one Holm family per section, with median difference and win rate), new threats text
+  - Greedy: `fixed_placements` cached by identity and `Placement.end/slots` cached (`rules/_shared.py`); R1/R2 `check` were already indexed, the profile showed fixed placements rebuilt 70546 times. `large-l90-building-s2` 192 s to 105 s. Plans identical on 29 golden instances (`tests/golden/test_greedy_unchanged.py`, `data/greedy/`)
+  - `scenarios/smoke/`: 20 instances (10 small, 8 medium, 2 large; seeds 201 to 220), `tests/golden/test_smoke_set.py`
+  - Large re-check (`docs/results/large-recheck-2026-10-31.md`): contract-net C0 on `l90-building` (was C104), resolve C0 on all three (was C289 and C128); contract-net equals greedy on all three
+  - ADR 0007 updated: time estimate about 20 h (26 to 30 h if large is everywhere as slow as load 90; the expected "more than 36 h" is not supported by the measurements), run-safety checklist, mid-run bug policy
+
 ## In progress
 
 - Next: the cheap checks (about 20 instances for contract-net, one seed per cell), then the freeze and the full run (ADR 0007).
