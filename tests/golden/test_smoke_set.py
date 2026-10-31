@@ -1,4 +1,4 @@
-"""The 20 smoke instances in scenarios/smoke/ (not counted in the 405) must stay what the generator makes.
+"""The 20 smoke instances in scenarios/smoke/ (not among the 405) must stay as generated.
 
 Seeds 201 to 220 lie outside the frozen grid (1 to 15) and the pilot seeds (101 to 103). They are
 used for the pre-freeze dry run and the greedy-unchanged golden test. Each file is regenerated

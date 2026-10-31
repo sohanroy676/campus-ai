@@ -1,2 +1,4 @@
 scenarios/frozen/*.json text eol=lf
 scenarios/candidates/**/*.json text eol=lf
+scenarios/smoke/*.json text eol=lf
+tests/golden/data/greedy/*.json text eol=lf
